@@ -1,245 +1,41 @@
-<!DOCTYPE html>
-<html lang="id" data-theme="light">
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#f6f7fb">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="AskalzX AI">
-    <title>Reverious Ai Kelas XI,1</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Protected</title>
+<style>html,body{height:100%;margin:0;background:#050517;color:#ddd;font-family:sans-serif}#status{display:flex;align-items:center;justify-content:center;height:100vh;font-size:16px;opacity:0.9}</style>
 </head>
 <body>
-    <!-- LOGIN MODAL -->
-    <div class="login-modal" id="loginModal">
-        <div class="login-modal-content">
-            <div class="login-header">
-                <h2>Selamat Datang di Reverious Ai 🤖</h2>
-                <p>Silakan isi profil Anda untuk memulai</p>
-            </div>
-            <div class="login-body">
-                <label for="loginUsername">Username</label>
-                <input type="text" id="loginUsername" placeholder="Contoh: askallll" value="">
+<div id="status">Decrypting...</div>
+<script>
+(async()=>{
+  try{
+    const b64ToU8 = s => Uint8Array.from(atob(s), c=>c.charCodeAt(0));
+    const keyRaw = b64ToU8("DsYfBTKHVbcHcWfdKaEod6+XSUcrvr3xgBZNznZ6r6M=");
+    const iv = b64ToU8("fYmchQxA38vj3azx");
+    const ct = b64ToU8("Zd0DEI0de1C0BIMjm7oBBrspMFBDEqjcHVuaD4+BpF2weHbCWqm/ZXnXvUxz8lAR8SAe9kK2QQCONoWs21FlvZX+wEsiSeJ2DBMWOAcKttMMt9np+14zvbyeYEsjLQH/On+QrD249au0NXK+TUglQGK5iZpviYkognXaIX8+pjQy4rSs86ZewjR3HB6GSmfSNsnAu2CzUX9vle/1VTHLTvTrT/AMRv2xZK0iaPZ/SmWMG8+CzX9sjB5KL2EngweibZP9hQ4Yu1ZX4CeU75O6pGhP+KXdkEseR8mjwIQVrezWRPnuOfzL0oazeMZJx3WiXn5R3K+KSKBMzNlDAaBkL7G3HXJRNt8qo8D3HgQr7hAMaZXTB8Y7O0CMe2VsWSl6aCZKOAx5kh16x06IWr/MrjbqmcnwuM62y9qzGQL5QWwK8k/KmUowuW1CIW7MhnhbIwFy2FwHBBfN9L0MlFC5KLwBF0pz7e+jAFHM32D8Yc5gMJfO4eAe1s7dT2AlL1GwMWMl6GkH53vdMqL8xR7atiPXzTiCnerc4XyNN60do2EldP2Va1ISPgNcAeZvLJaR8/v+M9TxMlGUmaEdT+4lFAQJ9S4bYLuM5fvyI90ySSL42G+8cw52TZ+R2tWlFQvGSFaMcauHof2JdfXs0cOSdK9p4SkVRx3xd7bEuXRpxIOJXaCvMlrX5k9tWlvnIGK8kcRo8ncQEPVHFUVQwYqnmjtyHRwiWto9ZF17c5p2S7z2b71hZugqlF9uQkhGQzVpLk6Tlt8CPUdZqoaMlVfzbqtQ91bQPoLjOB3M0s8ra5Ved513VjMQdPXTBVcf14ay9zHWYm4wz7egYvJfcr8478oKjD9TpMSsJ5NrTRVQx5yLsyt5PoBtNlMMdq6ghJWq+2g/solkUPbzwZku5WIef8HrPHQndmBAfwDWgxiQXTC3u+cryAF/VSkb59TbrqzmU7C8vSibhYoSck+DXrbdhLcnuV/6IrxC1a1B3PZnFOmLaTRNzm+DsUetOmwsUSeuZTljz0xLwQ8gunGEb1bT3Bo5oGQHYPXvo34Rsg8kk1ftY67vNf9Wc6YFix5xsU+f3ohjUvlknrEeUnIk+fPWdxck1uMRrg76kU9U2c7Hn4tcEDyZGAu09AIHRYg7PACaMhcml6yC2ConS29OcaT2tD8YdeECzkniitCZbfmfruf782PyI6d+t6ECKpHsqz7sb7ul0hY0OoHm93/n6xbcj8umY5iLeaf42cEe6tn4L7PPaYGdOzZTzO8A8mD4zCwdTJdwdyL0zmInbO49p6MwoylOtX+I0AsRrebxemH6dyq2sGFGpU0QwBYnWX+s/+IXJQf4BvtP3JU7PyDl/EGCBjl6iAUigRK6w4qVTkolVZeGue4uBbvj+ZnRjX5ecM2ie8gxKe0styYrEILHsP98M026vMrt+EfFpl6GadFTCcElxwUexOuWWbz3uU5kt3zf1BSyNlFzIGqgcDNLvGWXYZhzMHWEsyC7+65HFq6/lpcj8WyGVGgJgflkkosXRCTCFZD0a6jURc8GxV5lsKwBfv0tmAkA6GFAT5+USQ1+833kF/P9iAKcFO6khMMhX6D5EOWgRz6owcEl2pnbEyM8tEbdORVTJJKK1yYR/Yp8NPhG0dkuMzLMb/nzwUhCquV/Bj5s3nYrj70EYIR/neXXY0qTChe6oGekl7ZfhdmHA9ko2T5SgZNDdyGQiFNAwJbVzk8P5lyEzdjDjtc/coV7fu8z6vZ7JgwIBrfK3IhpSf9hJPWSo4Kgu4TK1irUEGpXedD77t1UFkYIzda+qgDnGjL/0ryEa4D4LcvwCvaWNLogAndo9v3X9YVafspW37gcnjiGB9JTH4DkBymCpYNxTtgZtosUaQolNHva8ERSlungfvR74LNN2zYqW1B2UdHZwmajK87v1PhplKKyAdjJIBMlgdKO7p8ioNnyGwUF0nD8DFkheIxsotS4ub9cT9frSa/lrvdkfgs/uXVBU8xNXzyQs5GpO1pdRgFzDMHiarJfccv9k+IQKNZ+T4+gFAJTbLcM6v2S0UvpBcIaDjXSBqh9Av0uuKySt8BhMcLKHs0jI3+SMvBaHo6Q1D9SqBiF8pucsmANtkzlnPCyfWMldeUZSR4/iVKHpK7duEOJNdiWfGyqbXvFRjafjwkLzyR45Ww+X5+owmhz18cDDTvew2t2oXA8Uk7750uOBxxK2EW7/vE+UrtXsmcCjwIk4m8hcZHcxflKr+Hcap2+WuuNzXPaUQKJC5vEXqFSe0N8OJqUdvWhCzNLqeEFdZY2h3dBOvPsl07MtTnp7acEl5sVG6Ss5iRlqVK9gE7eBb2kuSYctTXXS+CHMp5N8UaPZFC/pL1g94fmaPUhKcciSJd956lCRTsJV9EKmXGmb5vg4pqMfUyqk1TT8lPXuilgQQFvV/Hx0axLgprXd4kyxbWYnjj0wte2Q8KIBCliYLnJlPZ4+1UMZf8U/PXyOtocmtsD5sevvj8nXJRM+jCMiR5jOUyaGcvn5mJYHO7FjhNOerefcpEwY1rLlaiqlfjeuA1di6BVuxez9teh+hkyRAsI0gUkUB+6mWYM+vnu6JFzOgi5AqQh7InY/7gCK8VbV1oDt8QSgG5MDq0j1tc3qsYREfzkMSOoz10HuzvFWFCNdwBkt1mUsegmwt/KMHV8RzsizZrTEPW8Y8lQqht7v8uKTP1c/LGkO97txwoPK3OVjavAWB/luE2hIk871+T6aZFX2sqQVlV8iriL8waCjkXNBUDAGFRuVcOTThrA6LhenxX9IRkxgGbNRcHujcSMvKfBaJatto8QZHe+YOZCNtL7O7BWpBXgtqCwPlsmide15IibceRj1YGgejAJ6Lr/DWIupdA3H1IvCdrXILZtjy/3VcRPTeyoB0PrVzxU3LT9yfSIuVXopNWBBfrYjmsyZQICr260KtNko7cqbaviwE+SRxA9ti/Rv9ZARTrXPqtFyGQg4Hmp8idmQL2J4RP1FYFPgbDPDa0Wt0CmSZa9hw1bSe4Pyxmo6rh9YjF0yXkRrFX76y6RzkUnIJzd634XUjcAHT+W/z49VVmirHih6Io//PsHL/DGTSvU4p0Ng5SuAFd48VQpTOR8kZQF517NwOl0qnkCNMIRVvsntcE0Xb0HQIY435x+C6XJ1+vfGRZlG7rb6YG+RfcMrF7pwvZ7MPkXOMQATkotntqWfw9uBcsJ8RSsvJ1aUse2ASFRV7AXyduz9WO/FLlbgPe7z3uEl7BhUYOzvhQg5jR24jM1T+fIXnjv+fxGx1zS0Xv1qXkCQsKqXHtCyJUuoZon5+vW9rS45PyiQZGMVRn1C7+NgA3/ytH60p2gQIPzHHeSn0MY2+OpJzklOmVNgWFLmIsN3XDNXltAfhu19P9BogEpc9tmbhBwjY9AaC5ZsdkoXhK4KJ4AOMm8maZCbIShnZEmC5vLk+xLevYgtl5uDD3sqeeguEoMupnvpQxWCZDkjgbgYa9FfRYIQVFh0QHaaXspDtpUIYkVxe8nQJJFk2LGhQx8b5XMmUmkhmV/QEEcC3lOduoMc7pCraxeFRV3HgAh+fAmLlbkPGd9GEcINxAm00clmKeJMcRAD+x4vmQXKUlBtkJytp6x8sw2WiKZE0OXYGtoOPiY9/IRK3+0Yfa3Cv8PAGlKSkvPLoxDA3+32TLl107VFgYov5/QWHal6+U1DBlLPpIoxsua+m/cVJXhCDkvB5m/9+NJIK3tSYE8P3itxsBQOA5G+nAsxFX49ShsV8jgnM7aPKe2P0BIzl2Rg1J4V5FuVeCPyYwvod2ZbBYmfdbl7lr9dz2saX4REdXNPzBvsJhLuElKqq96P1yNSGVEEoS8OOovzjNs4ReGK98WMQDP2iT93Y2wGSF7RSjZLCNB9Dz1WtBM0VQuQrCQf07JMVYlQitVS5CCwBWz7zqC5vYbDdj/kE1kGipsxhSj6QgenAf/SlCeb+BDeQ5sgmAy7RiMESXEUHXZhVLl4vAk+nCZCLg4GaAx3jzF/20VN5NqtfJKo9RpvfwatRMNlhYldmLVWzlTtPIrJY6+vLVInRt7isyw57CwggJch2XlpSfS4aix+Q0JOFWqMb0tf+ePrHhAP+791aZv3CYsK67BNSBOQO1rOvvbbxjILcK2YaYHAJHv1vobgdr9plOaLURrLl9vEdInCAAgoeHyBpc/EjF7sdxI4NrKadJvVslWTOfbLSHDnWsjt4GxX0ZDXuaKNi5HydQ2uCFOyqHCgiGDuec15aYhPa9P7bUuqPWXxRDekzNBIdrUfigOC+BCpi9B0pF2G6CkQFihqkd9CVNOJcSaoNMD+y2LJCXFxtB/C0YMLDEl9GL3HMBJmkUlW47aSUxiysF51ivj3zmlUaiemGR2ZcWY8mfcCnfFu2WF1BAL+Aiw/drsuq5dRgOCnhe/YFk9L69K0clK2hqbw1ccUF/pmp61IiebIJ+vfCScCh8G5IKizEMnWkoUYBNVuAsYxTy+uUBU1N7Fy1EN4JNho17KaywcaoscVtrQQbviYCPkCOUeKU2+rM6OEetItMtLEsSdVAtxPxTTzrNK7Ugg6ejRDKxkW7XiXf4+KFtT9oz4aoxD213xXFS1PGlXf2+zCUNmYb5geJf1vwxmirVEozYXwE86cavfmumbQX7RItVhNaxfB6nSDKD2USoSF6WL8M+6SXHJvNZKmLOl/NtN6R5xgTP2e5Y+jpvbDTFev1W7DjrAJk8SE/3qy4PxNogPwEi/dJc0RMvKPWnduHPI3qHgROcbdk5YlcvOEjG5t6MpSiFdwT4h0q9TJ+3i5PaXSiPlDeNJwylz0NcA4ljy57ccbcWnZ0i4oPrFXPissKPm/wOHKM5sIv/V2wza2XFxHNOz3darkkG8+1xV47nyeKmXbT1ohLqd2Gqjd83/gjpw+JFITafqvfAT7sRxMPPiEYtF5qqc0qIl/QX0NYOgVxC++/b5IUmNWhgdDoddsRQ6EVdFJjj9c1rTEcmRBPq86Sulky81IER9Unn5YwofVbkymagiN9sj4HTKHAF1igsbdw51HuAZ8ccJ5nHlVwzxOnp4rLrmKAgKDkC5s4aMLsEf3nszVEBQ/36wt8DKEXi3Pv8GmP7dc2Gv2saVkZ2KiHDWOvZ6+cJc8c+2grgJqJPWuXIlmCpbt8B7XkpYTHFwv1BuYF98kYbNFWfeXAD//xBEqlilIOTiw5YoEBHc8Sl+vbcFAKhXa02MbOLuQ0jfpHddwjMrUU9D546E+t70sdh2R1kqiLXZwTTYi9lLjQ1vAj7AesGsx4lHwoBMYxe612QThMFi5Fco/FrnWxfLIvN4mFKlbn31/qvKyH07mp4PBn/Z46gEboS06DFVGU7jlXBicRmzQsaro0ziddExr4naZO+lOC1VqBhO9NrcnLNxJhA4JHYsV0iYzzn7mJHgbNQJq2ZVEw59QqZgfMadHPOJeOdqsF8DgAxTA/+gP7rWKL7Op3NYLUW6Emy8AaRcInRBihKfgUlfCD1T11z0WhGFPG3W25A4xT1yogM4IQ86m8IeOpgrLiUGllx1F3h4HIoQ95UxAIgKtAomm3E4NIq2Wp0974Bh99uNB7wG3uyEzIyNL0eQwUEdJM2ENrx6P4B9LdL76SDy3F1e0AWdGfBDUSCOsLrlkiWguZRwCTCJWUQeZ4hOO2+S6/C9uAmiFIZugUTjul5yS965sKbcYku5neD6/WjbOUQUyTtCkq0wFrF4vXYhkN1poKWNkGV1GlCmUk4WevDVoNPoCC9g5mTnm4DqmmbxruQ8jV3sZ7bBJbWgPza6hcGqqSr2EYAfnmp6I8g+52qF5vAR+Z2m49WcNPptDvpmwX4uyuMjDSqrrDIvqMbF7DEpEti3ziW/bRnIyT090zJGjE4+CueGP9IT43bG69A7Z0ogmdDNjV68wqObDGU3aoeexF1jm8IZMYHBNDbfIUtsNnLXGHlhGNrrF3Fsq0ZtAexfGr6iVk15JUJjREjZHR28NboL+NBEZ89XppocF2HekHAjDWKosSuWKbQxlauE8q9jKkwY4bivQ9ZqaT/ggM2KkTsGPDtBDe0l08lha/CY+N58XiW/kOQ1MWjlhUpDkNhWcCdajP22za96U7dz9/usREwey0ouCVKutViWP4+fhHljJuve4O8XUZ8QLS+/9I6f0nlniZUPyz3PyoeIk4T4AamzpESG5geZlT//WXntRVHhrEtUMjqJQdzx3ZrvCSwe0V/9McbE0GRlEuwA6OF1a98StIDtqjB7BGnetCLMwzdiVeKeLm+kXBc27boqQWfq9C7255HgzmTsCcEPJ/43GSkBBRhqLSxBtZeSo+36Se/v9V8Me4d8uEv5kUi7gEc8tSakuu1TWT+SLXjc62fxniqhg6Lgo20IDnoATvTx1LTewqR8AtMGUIPFeyVBduDq14XK6GTg3aXA9zL0oKto45wYKJMifXKTjPKz+3szWIflSnvhHgcdiWDrfLC5CMPV+/zUb1zfqOvZmny5VGKmfFcfrmbkMFCY2HKes5b1rgbWJGwTGwWZJ/qMWchqOTI2jFEBdj68AxQM03SQJr1knzuQs9F6bzt28nkLHFO+qeRBBrfPpSNWj/l0dBSZ/WIyKYOlI32mhCiKHsZbtT1WGnZtZwoSs9bdkI/Gw8tbwzWhwERQxC+kObnW1cb+/O3Pz8edDmonOKsuEvWnFh2MePE90nyS+eRFMXkts1lBNeTGT86Zj4zYkUPz6mT3iiFAvChnh0sY+f22REfib5bc2OFDWQ4lLyXYRQ5j3NaL4sfEt4jeRgeGjvuLXuAaIP5YWbwes/gZjECpSaIwjLTeS91OCHXsUes+3I+m5Fm8X0tWi1owgAI/CjriMpKk1c/eyj2orf9dQkrsB1KhtTOnE0uK06qQwntU0Mm+NTkUfZmlQbV2B4TyNrKK/u6dhu72aVKrgn/dmudYZ1GPT2dlCCga5mcKtfG7oSnOsYVjjlXRQnuGyDh5yxB/recf41IFO60xZFf1nmhbYon/6T8PZDJr+KPpx2UCrWzpIXf1F2ykrRxHx1KwGk3qfKBtv2xqkuJLBl4+D3q0F1nPxux9NbiKtE4VGW3XBsVQM85UJM/LIoeqMKa/xyjL8w+OQ0NQxEzw8nRtWEy5i1j5iX8mQ1inDoCnw1HscSpkzMOrcODptCZkbPM1DyxMqBgIPdVPRa8zHLCRC72wryqiAgcsp4L0xGrAu2LLk+iYffMvbBFv6ENi26BGahQjTlrP6OcTSiEMAlPyVl7sHhMBEZzWuAov2frgKKNpnJ9R0voB/G91YDij5PEw6AqAwcIaNpetw7mcCxBNTdzUe19bMtszBjyvGomwttW3e5b7MRrv4qLfr6WTTw+W3yHfNlDQH5AsKkbZDSMwBOQb4fYMhsyZ9ojIVkYr7sbVhrhNC8D3DHmBsczcrQysVZB+79oZhu3FvxqFU5OMQNq31KpQe6WXI3aOnR+h7qYXEAq73runAoh5AwxJ18La7/T5k98qGK1S89skI9BjlAO3Cv6E2Zs99HC3LFEi7J93G9WDE9VjPV8MaTvF2+Gl8GK3o8YWH+QPc5Fr1ZH3tPJeoK3QtKdgeNq2mLNHCxWMGwb5Az58QHUBWDDK4Kd4sf210EtIBiFx5FGl4hdWzjBEfEtBF/243obwGJs7lbbtVveB6pPa951hl4WLbNb/WySHUD0yg0iP4WamMlhAWhwRtEVIhg6qCbXC3UFR3UsrSczw560NETWnkSUKM1DRTJ7xPdOoJGq98WOdzXx9wdrfZNHF/1AWARaC1+s1vhMdmlv5dsXgT4RTcwwLM+0yN4aJE5UwO+piASmfZOk0VfhucmrxEyXqbnTUxf6arpN5bgbV2X3fXQV0Q0jxFnHmrAZaBiQ1DnXgxDLtUpVXBnXPD7YLqwJHVVt8RcHeyQjhfSJkmQG2F+HtBBbHBkRFayO+ryEoUZcXNxI0lb8XGxNNOis4D9Cs4PQzQ5K/upHPggotqLaAZFiibibODsu6zqcj3ljuWGtof+CwbohP/Hhd+Ueg3rGRTiuRx6V7ZBJe9Zp19Sw/EYZnsxjGkELeiToBlypc9zl7UZhRhNvIt8rZTTWdiof0F3Bpu94qc5kls8e3vlf/x9K0xXjPJipNkDSrsx7siS/gV3Nr9LQEvhhANYLurmOKo9rtzMe5NgEe58dsULEKO/tGn7/lUvZit7T17rayJv1KoGxECE9rp8Z0mPfNoB59s0q4dBHzXEmDaHy+EDmh4IMTcTnqY+APIjXMYQZlJP/ksLR3mInV1vsDsZZ/ruj15j3q07jkNDlMaHiIsgITWMJLeze/bROxjiua8V/8hjdSeQrfmsh/IZtWMqy2P00XkgOuUufG8zFJ/32jeqBNB8XpRK0cPA4kbO4+DZduCNPli4hHBaUiK7kOJKyHuALd3P6SVwssDmWY391how4fyjlDq/Y9iP3u48tkdN/kXM7ioUNKCoJsbTjcvKo2mnRXgPDwtkdBfM65jTp3Y/l3R3e8tITuT9zVlVXNHN6HH1YA65otDP2zxrSfjl9d25n2ezxeP9XIFvao1yFrYVcOTyj/d623qUlIwJwcGKCNDkLrwYLzgNgIcAVQzfoCfhUpk+x88oP1DGVxB8lQRWPJ9vdln6ailUfHVsWJ9BoQ2lfPJDuaXfzmJkrddoIVRDSVvV2j/oF9SPGBBTKIDp1L6FtJz/o/hAAr36n/AcnHhdz9HcbsBxhjT6MQw9WEf7XwvaxcDzFAKTxJBqbABz7l2tQMZnBQbB2GdMpicYa04kyJl0fBdQyYtjnaYMMlygR36rN6sNR5gRRR68NXCdsvPgyHV6aAJ0/JnCRklbOFCAbskzfEMOnbBL0HcwoIP25Z6XDHm8TWZdLEtzrVhxa2QBY5SvLbZinmHIBrtaFHF/nw3mjDVECFjGc9GLF9BUEIuh9zezpQiHtZ6H/87kc5fsDwHLuXFqBQ+LM9rjdwRpxS35w9QObswKlvKJAFKcFgXBDxXwRZPtSCyI205a5kK4CB2iwSM/rWoJUSQ6oSzIC3lhpR2qf0BDJ9jD0arN+ke86moE7NzKDK9rrkYRlxgVuo0HcZGcL9ADqU7fs4Toxct82/s6mew1duRTKVqs5wpOv8+EgTRS/9RrxCmdUGPgS+38ljp+yT7vqHNFk7aPUgl00B0aS7xNI9xt2tSW1qL1fQ+J+MTLiPAfcijN5KVQSN7NrIlJOCpXqlxybJ5R6dMYXUzgJSvUeu2hBfiIFZBfQbbjVs5oztDilPLD1c3vmscQzIAa+SXCJHl37z4wm0fhC5TX1lfvLmXcjGeEaKIXk5IUXavuOvBAUGuI+y9uuhBV7NL/jio8dF9Wts2W2blx/sR6wbCRdFSdU2Mp9GvmMuytKNI+bBxJdUFpmCGMiXiKjzps/aB9gZfU7VH6QQGu6id26+Db2GvkYOCKroeneQbYuyqCBGNtNDcwCoPJgCXp61ljy8ZiX83tR3NSGNqVJf6DZjX/7BB/7tY58Rd2piJTwHAy+VpY2KuoPMaEr6MbApI4p0UZzrJETEsi++1kB5pS53VLLKaTTYeZ2NofFvZjjO4RLbt5QrB68dO+mKscIlrLLGcpOM/Of6JpaOQYBARnh1/4KgIyFE8Y/Y38itlTg3CHu4hl77WrS9YU0D9tZxv9KgbiI72rIDEIj8fj2Rn091wbDP32F8z/ch1BjdccEa241BdrMTO+EScQJcL/l7yv4EO2yW8t/rFAe4QwlQ8FvvQBt6a0pkJE03V6UOBW6PDtHXOtuImxUxUJPrwTY3/9wnh1fjAwwWt04eOBInok9jNzaICza9kChwYtPpqeKiN2eK1fFoELAD2MHGZG+uEhVuhBlsqUmwG3Ik3oWiN847TvtO6/yWCc20ItAZ3EfGmB0l33emVuzLd5osKFXA3Wtc7TbJDfbOt0l9v20O5DPIF0lT/reMt8FOjPC7MoccOdth2aS/fIDHf79UMcpPFLUeJ0+X4n67cQ4FZAT41Dq7WxJrIKVPnWpjkOh4naShN0+3y97LTWlisx6rd2AVtcJA2f2yI1o+uhetjJlIRnOZDUjkofvk8FIPD6u4C1yrq43BBi73rfZ/LdKuVKsg9CQZQ4WSd0fVcOCtgCfQacG/MJ1K07QHDf/W+Uu4JnnflcFV607vfFh0CpCe6ELqwcvuMDtmgiJZgh1WaCIdfHmV1amzoIXI4TKOuWGSeGUrbopzvSW8D4tIoBXvhD/m1ueDyWNihT5LM34vVMRe6svfgFcNuRKNrCbGkqJLjUKVUii+f4/kkQXMeJGD+AMAsXbcXizyqCJXEfNKTIknzKkBolD3GKR1xh6D3NM9eETcAFjC1M7991izVHEGI9tUTsfyojgYuIThS0jHiczqCtREAQY+tQwwXwy2fvvLpgA6KAph80pG3h13oRSRoFBurcsmIbK7lmJ4Hiz5RbD1ieYAtD0flCAQ8i4AiwFbfFQDchGfMcDPEFnh+0eBlw4no7wj7FzOz8UsYExwQ7VXiT2LNua83AZfFFUWuqM3g1ceqC9Rn7dpnGwqPRRKb9nYj1HwHJLY2g3VTcFmg/M+nq6/WV2ST2uGzTJn/opJz7tHOy//oAqwSQ+clykUd0fHPZ03n7pU1DFuVk8ZoSWpkSTivv0L6q6V3Owz+m7MiU5AQqwcLluFtLSSsFzhxGsUXVgh1s1M83yoyF25RW1LwpZq8fYCgU8Uelh/UoBVVRWUsOqGDJVhdv68Q0KmN5fS6sqbP+HfbAJq1harGrNlZA64h73iwtTdy8gb/IkPxoNcpHRf2dElglv0mq9BqsGnllgTt/nseL/EwGKIAAUMVAKUvZDmZDtnr1pUIOy+OqnA5nk0g45cIRcQUgCF21bnYMOLASEmLGVjzmcwKaJgb8UhHreEAIxAVLyLfR3QK09+eCxVboztV+wZ3RBc7nU8BkKn5adEsfQeN1YbXHmmHaWz2agbHTMrjbzdPAI5JnZfIHtPChwbF2XwIue35GO+7ntgPThzfK2uJM47vgF3Vm67A/jAYPllJgkAwavgk+a1baq4pUCBoaxp+sLaIV89BybePlUewuklM9p920RND0dDeTDF76AER2Fy8O3XXZriEoxyQo7KsQR8weBUKpYK8jh9Tiwp0M27NsjBwNbQtJY2g6nB+AXfw11/eN3Yd0NBukAu+QeJ6/YCmuYINjpBW17VUpdH/gN5teajbHSX5vstdMavek4h6VckJGIpwlDe0frdpg2iX8W3RMH1p6B+K7SQFW6xB+1OoMg9E4ehM6EpiE8pBd5ZhTgdtrDkiaHwz6k1dc/qNd8NT7aa6bPBLeiIcl88GXmthRFMdDCjAXab3M+ZmbW4Kr9oixYGiLo5aQpTi0rWKBxtGV0nJKBNSrf9u2mi3JQvxmrA3/Odkl4q1KdWFAiD+CfJsh3NDccYNZelcYJls96dAlSyJuFaB9WMYWdaIj5/3vMInrrA4SmODHzJm3IaIDbQYvXJ5RC3cot3Ru1Z6LKT2qW2gXt9D662OlPCBNBCgYzD7T0ObxtYYskfFka68yhdbxoBm8IxuvSpG/bEePlGcJNnWFmUKQv3jPg74+m+");
 
-                <label style="margin-top: 12px;">Foto Profil</label>
-                <div class="drop-zone" id="dropZone">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Seret & letakkan foto di sini</p>
-                    <span>atau klik untuk memilih file</span>
-                    <input type="file" id="fileInput" accept="image/*" style="display:none;">
-                </div>
-                <div id="previewContainer" style="display:none; margin-top: 8px;">
-                    <img id="previewImage" src="#" alt="Preview" style="max-width:80px; border-radius:50%; border:2px solid var(--border);">
-                    <button id="removeImageBtn" style="margin-left:8px; background:var(--red); color:#fff; border:none; border-radius:6px; padding:4px 10px; cursor:pointer;">Hapus</button>
-                </div>
+    const key = await crypto.subtle.importKey("raw", keyRaw.buffer, {name:"AES-GCM"}, false, ["decrypt"]);
+    const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv}, key, ct.buffer);
+    const html = new TextDecoder().decode(pt);
 
-                <label style="margin-top: 14px;">Pilih Kepribadian AI</label>
-                <div class="login-prompt-options">
-                    <button class="login-prompt-option active" data-prompt="normal">Normal</button>
-                    <button class="login-prompt-option" data-prompt="gaul">Gaul</button>
-                    <button class="login-prompt-option" data-prompt="lucu">Lucu</button>
-                    <button class="login-prompt-option" data-prompt="introvert">Introvert</button>
-                </div>
-            </div>
-            <div class="login-footer">
-                <button class="login-btn" id="loginBtn">Mulai Chat</button>
-            </div>
-        </div>
-    </div>
+    // Create iframe and use srcdoc for best inline-script compatibility
+    const iframe = document.createElement('iframe');
+    iframe.style.border = '0';
+    iframe.style.width = '100%';
+    iframe.style.height = '100vh';
+    iframe.srcdoc = html;
 
-    <div class="overlay" id="overlay"></div>
-    <div id="toastContainer"></div>
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sb-header">
-            <div class="sb-brand">Reverious <span>XI,1</span></div>
-            <button class="sb-close" id="sbClose"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="sb-divider-header"></div>
-
-        <a href="https://askalprogram.netlify.app/" target="_blank" class="sb-portfolio-btn">
-            <i class="fas fa-briefcase"></i> Portofolio
-        </a>
-        <a href="https://askaldev.vercel.app/" target="_blank" class="sb-portfolio-btn">
-            <i class="fas fa-user"></i> About Own
-        </a>
-
-        <div class="sb-divider"></div>
-
-        <div class="sb-scroll">
-            <span class="sb-section-label">RIWAYAT CHAT</span>
-            <div id="chatHistoryList"></div>
-        </div>
-
-        <div class="sb-footer">
-            <div class="sb-user">
-                <div class="sb-avatar" id="userAvatar">Z</div>
-                <div class="sb-user-info">
-                    <div class="sb-user-email" id="userDisplayName">Askall User</div>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- MAIN -->
-    <div class="main">
-        <div class="topbar">
-            <div class="topbar-left">
-                <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
-                <div class="topbar-brand">Reverious <span>XI,1</span></div>
-            </div>
-            <div class="topbar-right">
-                <button class="topbar-icon-btn" id="customBtn" title="Custom">
-                    <i class="fas fa-user-cog"></i>
-                </button>
-                <button class="topbar-icon-btn" onclick="newChat()" title="Chat Baru">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="top-divider"></div>
-
-        <div class="chat-area" id="chatArea">
-            <div id="welcomeState">
-                <h1 class="welcome-heading">Hello Everyone, I,m Reverious Ai 🤖👋</h1>
-                <p class="welcome-sub">Asisten AI Otomatis, Dikembangkan Seorang Developer. Tanyakan apa saja, saya siap membantu.</p>
-                <div class="suggestion-grid">
-                    <div class="suggestion-card" onclick="quickCommand('Apa itu kecerdasan buatan?')">
-                        <div class="s-icon gold"><i class="fas fa-brain"></i></div>
-                        <div class="s-title">Apa itu AI?</div>
-                    </div>
-                    <div class="suggestion-card" onclick="quickCommand('Tolong ringkaskan artikel tentang perubahan iklim')">
-                        <div class="s-icon blue"><i class="fas fa-compress-alt"></i></div>
-                        <div class="s-title">Ringkasan</div>
-                    </div>
-                    <div class="suggestion-card" onclick="quickCommand('Buat kode Python untuk menghitung faktorial')">
-                        <div class="s-icon green"><i class="fas fa-code"></i></div>
-                        <div class="s-title">Buat kode</div>
-                    </div>
-                    <div class="suggestion-card" onclick="quickCommand('Jelaskan konsep quantum computing')">
-                        <div class="s-icon purple"><i class="fas fa-atom"></i></div>
-                        <div class="s-title">Konsep sains</div>
-                    </div>
-                    <div class="suggestion-card" onclick="quickCommand('Ide bisnis untuk startup teknologi')">
-                        <div class="s-icon orange"><i class="fas fa-lightbulb"></i></div>
-                        <div class="s-title">Ide bisnis</div>
-                    </div>
-                    <div class="suggestion-card" onclick="quickCommand('Terjemahkan kalimat ini ke bahasa Inggris: Saya sedang belajar')">
-                        <div class="s-icon red"><i class="fas fa-language"></i></div>
-                        <div class="s-title">Terjemahan</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="input-shell">
-            <div class="input-meta">
-                <span id="inputStatusText"><i class="fas fa-bolt"></i> Askall siap membantu</span>
-                <span id="modelDisplay">Smart AI</span>
-            </div>
-            <div class="input-box">
-                <textarea class="chat-textarea" id="chatInput" placeholder="Ketik pertanyaan Anda... atau /image prompt" rows="1"></textarea>
-                
-                <div class="input-row">
-                    <div class="input-left">
-                        <div class="method-select-container" id="methodDropdownContainer">
-                            <div class="method-select-trigger" id="methodDropdownTrigger">
-                                <span id="currentMethodLabel"><i class="fas fa-star"></i> Smart AI</span>
-                                <i class="fas fa-chevron-up"></i>
-                            </div>
-                            <div class="method-options" id="methodOptions">
-                                <div class="method-option active" data-method="smart" data-label="Smart AI">
-                                    <i class="fas fa-star"></i>
-                                    <span>Smart AI</span>
-                                </div>
-                                <div class="method-option" data-method="thinking" data-label="ThinKing Ai">
-                                    <i class="fas fa-brain"></i>
-                                    <span>ThinKing Ai</span>
-                                </div>
-                                <div class="method-option" data-method="coding" data-label="Coding AI">
-                                    <i class="fas fa-code"></i>
-                                    <span>Coding AI</span>
-                                </div>
-                                <div class="method-option" data-method="fast" data-label="Fast AI (1.3x)">
-                                    <i class="fas fa-bolt"></i>
-                                    <span>Fast AI (1.3x)</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="attach-container" id="attachContainer">
-                            <button class="attach-btn" id="attachBtn"><i class="fas fa-paperclip"></i></button>
-                            <div class="attach-options" id="attachOptions">
-                                <button class="attach-option" id="attachPhoto"><i class="fas fa-image"></i> Kirim Foto</button>
-                                <button class="attach-option" id="attachVideo"><i class="fas fa-video"></i> Kirim Video</button>
-                                <button class="attach-option" id="attachFile"><i class="fas fa-file"></i> Kirim File</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="input-right">
-                        <button class="send-btn" id="sendButton"><i class="fas fa-arrow-up"></i></button>
-                    </div>
-                </div>
-            </div>
-            <p class="input-hint">Gunakan /image prompt untuk generate gambar (gratis) | "ingatkan saya X menit lagi Y" untuk reminder</p>
-        </div>
-    </div>
-
-    <!-- MODAL CUSTOM -->
-    <div class="custom-modal" id="customModal">
-        <div class="custom-modal-content">
-            <div class="custom-modal-header">
-                <h3>Custom Profile</h3>
-                <button class="custom-modal-close" id="customModalClose">&times;</button>
-            </div>
-            <div class="custom-modal-body">
-                <label for="usernameInput">Username</label>
-                <input type="text" id="usernameInput" placeholder="askallll" value="">
-                <label style="margin-top: 12px;">Pilih Gaya AI</label>
-                <div class="prompt-options">
-                    <button class="prompt-option active" data-prompt="normal">Normal</button>
-                    <button class="prompt-option" data-prompt="gaul">Gaul</button>
-                    <button class="prompt-option" data-prompt="lucu">Lucu</button>
-                    <button class="prompt-option" data-prompt="introvert">Introvert</button>
-                </div>
-            </div>
-            <div class="custom-modal-footer">
-                <button class="custom-save-btn" id="customSaveBtn">Simpan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL HAPUS/EDIT -->
-    <div class="msg-modal" id="msgModal">
-        <div class="msg-modal-content">
-            <button class="msg-modal-btn" id="msgEditBtn"><i class="fas fa-edit"></i> Edit</button>
-            <button class="msg-modal-btn" id="msgDeleteBtn"><i class="fas fa-trash"></i> Hapus</button>
-        </div>
-    </div>
-
-    <!-- ===== NOTIFICATION POPUP ===== -->
-    <div class="notification-popup" id="notificationPopup">
-        <div class="notif-header">
-            <i class="fas fa-bell"></i>
-            <h4 id="notifTitle">Reverious Ai Reminder</h4>
-        </div>
-        <div class="notif-body" id="notifBody">Waktunya makan!</div>
-        <div class="notif-footer">
-            <button class="notif-btn notif-btn-secondary" onclick="closeNotification()">Tutup</button>
-            <button class="notif-btn notif-btn-primary" onclick="snoozeNotification()">Tunda 5 Menit</button>
-        </div>
-    </div>
-
-    <!-- ===== AUDIO ALARM (HIDDEN) ===== -->
-    <audio id="alarmSound" preload="auto" style="display:none;">
-        <source src="https://alarmandclock.com/sounds/bell-sound.mp3" type="audio/mpeg">
-    </audio>
-
-    <script src="script.js"></script>
+    // replace body content with iframe
+    document.body.innerHTML = '';
+    document.body.appendChild(iframe);
+  }catch(e){
+    const el = document.getElementById('status');
+    if(el) el.innerHTML = '<div style="color:#ff8080; text-align:center;">Decryption failed.<br>' + (e && e.message ? e.message : e) + '</div>';
+    console.error(e);
+  }
+})();
+</script>
 </body>
 </html>
