@@ -23,7 +23,7 @@ const GROQ_MODEL = "openai/gpt-oss-120b";
 // ─── API KEY PER MODE ───
 const GROQ_KEYS = {
     smart: "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",
-    thinking: "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",
+    thinking: "AQ.Ab8RN6L31KWYu-TNfYWEGNzbOijlYN96nmzJNsXAP0hTpEU6ig",
     coding: "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",
     fast: "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"
 };
@@ -1359,86 +1359,135 @@ async function sendMessage() {
         return;
     }
 
-    if (hasImage) {
-        welcomeState.style.display = 'none';
+if (hasImage) {
+    welcomeState.style.display = 'none';
 
-        const row = document.createElement('div');
-        row.className = 'msg-row user';
-        const bubble = document.createElement('div');
-        bubble.className = 'msg-bubble';
-        if (text) {
-            const textDiv = document.createElement('div');
-            textDiv.innerHTML = formatWhatsApp(text);
-            bubble.appendChild(textDiv);
-        }
-        const img = document.createElement('img');
-        img.src = `data:image/jpeg;base64,${pendingImageBase64}`;
-        img.style.maxWidth = '100%';
-        img.style.maxHeight = '300px';
-        img.style.borderRadius = '10px';
-        img.style.marginTop = text ? '6px' : '0';
-        bubble.appendChild(img);
-        row.appendChild(bubble);
-        chatArea.appendChild(row);
-        chatArea.scrollTop = chatArea.scrollHeight;
+    // Simpan data foto SEBELUM preview dibersihkan
+    const imageBase64 = pendingImageBase64;
+    const imageFile = pendingImageFile;
+    const userText = text || 'Analisis gambar ini dengan detail.';
 
-        const imageBase64 = pendingImageBase64;
-        const userText = text || 'Analisis gambar ini dengan detail.';
-
-        const sessionContent = text ? text + ' [Foto]' : '[Foto]';
-        currentSession.push({ role: 'user', content: sessionContent });
-
-        chatInput.value = '';
-        chatInput.style.height = 'auto';
-        clearImagePreview();
-
-        isProcessing = true;
-        sendBtn.disabled = true;
-        sendBtn.innerHTML = '<i class="fas fa-times"></i>';
-        sendBtn.classList.add('stop-btn');
-        stopTyping = false;
-
-        try {
-            if (currentMode === 'thinking') {
-                await showThinkingBubble('🔍 Menganalisis gambar...');
-            }
-            if (stopTyping) {
-                hideThinking();
-                isProcessing = false;
-                sendBtn.disabled = false;
-                sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-                sendBtn.classList.remove('stop-btn');
-                return;
-            }
-
-            const analysis = await callOpenRouterVision(imageBase64, userText);
-            if (stopTyping) {
-                if (currentMode === 'thinking') hideThinking();
-                isProcessing = false;
-                sendBtn.disabled = false;
-                sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-                sendBtn.classList.remove('stop-btn');
-                return;
-            }
-            if (currentMode === 'thinking') hideThinking();
-
-            currentSession.push({ role: 'assistant', content: analysis });
-            await typeMessageWithCode(analysis);
-            saveCurrentSession();
-            renderHistoryList();
-
-        } catch (err) {
-            if (currentMode === 'thinking') hideThinking();
-            addMessage('assistant', `❌ Gagal analisis gambar: ${err.message}`);
-        } finally {
-            isProcessing = false;
-            sendBtn.disabled = false;
-            sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-            sendBtn.classList.remove('stop-btn');
-            stopTyping = false;
-        }
+    // Validasi foto
+    if (!imageBase64) {
+        showToast('Foto belum siap. Silakan pilih foto lagi.', 'error');
         return;
     }
+
+    // Tampilkan foto di chat
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+
+    if (text) {
+        const textDiv = document.createElement('div');
+        textDiv.innerHTML = formatWhatsApp(text);
+        bubble.appendChild(textDiv);
+    }
+
+    const img = document.createElement('img');
+
+    // Gunakan tipe file asli agar JPG/PNG/WebP tetap benar
+    const imageType = imageFile?.type || 'image/jpeg';
+    img.src = `data:${imageType};base64,${imageBase64}`;
+
+    img.style.maxWidth = '100%';
+    img.style.maxHeight = '300px';
+    img.style.borderRadius = '10px';
+    img.style.marginTop = text ? '6px' : '0';
+    img.style.display = 'block';
+
+    bubble.appendChild(img);
+    row.appendChild(bubble);
+    chatArea.appendChild(row);
+
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    // Simpan pesan ke riwayat
+    const sessionContent = text ? text + ' [Foto]' : '[Foto]';
+    currentSession.push({
+        role: 'user',
+        content: sessionContent
+    });
+
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+
+    // Bersihkan preview SETELAH imageBase64 disimpan
+    clearImagePreview();
+
+    // Mulai proses AI
+    isProcessing = true;
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-times"></i>';
+    sendBtn.classList.add('stop-btn');
+    stopTyping = false;
+
+    try {
+        if (currentMode === 'thinking') {
+            await showThinkingBubble('🔍 Menganalisis gambar...');
+        }
+
+        if (stopTyping) {
+            hideThinking();
+            return;
+        }
+
+        // Kirim foto ke AI Vision
+        const analysis = await callOpenRouterVision(
+            imageBase64,
+            userText
+        );
+
+        if (stopTyping) {
+            hideThinking();
+            return;
+        }
+
+        if (currentMode === 'thinking') {
+            hideThinking();
+        }
+
+        // Tampilkan jawaban AI
+        currentSession.push({
+            role: 'assistant',
+            content: analysis
+        });
+
+        addMessage('assistant', analysis);
+
+        saveCurrentSession();
+        renderHistoryList();
+
+    } catch (err) {
+        if (currentMode === 'thinking') {
+            hideThinking();
+        }
+
+        console.error('ERROR ANALISIS FOTO:', err);
+
+        addMessage(
+            'assistant',
+            `❌ Foto berhasil dikirim, tetapi gagal dianalisis.\n\n` +
+            `Detail: ${err.message || 'Kesalahan tidak diketahui'}`
+        );
+
+        showToast(
+            'Gagal menganalisis foto',
+            'error'
+        );
+
+    } finally {
+        isProcessing = false;
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        sendBtn.classList.remove('stop-btn');
+        stopTyping = false;
+    }
+
+    return;
+}
 
     welcomeState.style.display = 'none';
     addMessage('user', text);
