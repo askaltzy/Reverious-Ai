@@ -522,7 +522,7 @@ document.addEventListener('DOMContentLoaded', initNotification);
 // ============================================================
 const OR_API_KEY = "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";
 const OR_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OR_VISION_MODEL = "google/gemini-2.0-flash-exp:free";
+const OR_VISION_MODEL = "google/gemma-4-31b-it:free";
 
 const POLLINATIONS_URL = "https://image.pollinations.ai/prompt/";
 
@@ -1233,26 +1233,59 @@ async function callGroq(userMessage) {
     }
 }
 
-async function callOpenRouterVision(imageBase64, userPrompt = 'Analisis gambar ini dengan detail.') {
+async function callOpenRouterVision(
+    imageBase64,
+    userPrompt = 'Analisis gambar ini dengan detail.',
+    imageMimeType = 'image/jpeg'
+) {
     const style = customPromptStyle || 'normal';
     let systemPrompt = PROMPT_STYLES[style] || PROMPT_STYLES.normal;
-    systemPrompt += `\nKamu adalah Developer Reverious Ai 🤖. Analisis gambar yang dikirim user dengan detail dan berikan tanggapan yang bermanfaat.`;
+
+    systemPrompt += `
+Kamu adalah Reverious Ai 🤖.
+User mengirim sebuah gambar.
+Analisis gambar tersebut dengan teliti dan jawab pertanyaan user berdasarkan isi gambar.
+Jika gambar berisi teks, baca teks tersebut sebisa mungkin.
+Jika gambar tidak jelas, katakan bagian mana yang tidak jelas.
+`;
+
+    // Pastikan MIME type valid
+    const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif'
+    ];
+
+    if (!allowedTypes.includes(imageMimeType)) {
+        imageMimeType = 'image/jpeg';
+    }
 
     const messages = [
-        { role: 'system', content: systemPrompt },
+        {
+            role: 'system',
+            content: systemPrompt
+        },
         {
             role: 'user',
             content: [
-                { type: 'text', text: userPrompt },
+                {
+                    type: 'text',
+                    text: userPrompt
+                },
                 {
                     type: 'image_url',
                     image_url: {
-                        url: `data:image/jpeg;base64,${imageBase64}`
+                        url: `data:${imageMimeType};base64,${imageBase64}`
                     }
                 }
             ]
         }
     ];
+
+    console.log('📷 Mengirim foto ke AI Vision...');
+    console.log('MIME:', imageMimeType);
+    console.log('Ukuran Base64:', imageBase64.length);
 
     const res = await fetch(OR_URL, {
         method: 'POST',
@@ -1264,15 +1297,29 @@ async function callOpenRouterVision(imageBase64, userPrompt = 'Analisis gambar i
             model: OR_VISION_MODEL,
             messages: messages,
             temperature: 0.7,
-            max_tokens: 1000
+            max_tokens: 1500
         })
     });
-    if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error?.message || `HTTP ${res.status}`);
-    }
+
     const data = await res.json();
-    return data.choices[0].message.content;
+
+    if (!res.ok) {
+        console.error('OpenRouter Vision Error:', data);
+
+        throw new Error(
+            data?.error?.message ||
+            data?.message ||
+            `HTTP ${res.status}`
+        );
+    }
+
+    const result = data?.choices?.[0]?.message?.content;
+
+    if (!result) {
+        throw new Error('AI tidak memberikan jawaban.');
+    }
+
+    return result;
 }
 
 async function sendMessage() {
@@ -1435,10 +1482,11 @@ if (hasImage) {
         }
 
         // Kirim foto ke AI Vision
-        const analysis = await callOpenRouterVision(
-            imageBase64,
-            userText
-        );
+const analysis = await callOpenRouterVision(
+    imageBase64,
+    userText,
+    imageFile?.type || 'image/jpeg'
+);
 
         if (stopTyping) {
             hideThinking();
