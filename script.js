@@ -1,1 +1,2246 @@
-<script>document.write(unescape('//%20%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%0a//%20%20STORAGE%20%2014%20dengan%20fallback%20jika%20localStorage%20tidak%20tersedia%0a//%20%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%0alet%20storage%20%3d%20%7b%0a%20%20%20%20_data%3a%20%7b%7d%2c%0a%20%20%20%20getItem%28key%29%20%7b%0a%20%20%20%20%20%20%20%20try%20%7b%20return%20localStorage.getItem%28key%29%3b%20%7d%20catch%20%28_%29%20%7b%20return%20this._data%5bkey%5d%20%7c%7c%20null%3b%20%7d%0a%20%20%20%20%7d%2c%0a%20%20%20%20setItem%28key%2c%20value%29%20%7b%0a%20%20%20%20%20%20%20%20try%20%7b%20localStorage.setItem%28key%2c%20value%29%3b%20%7d%20catch%20%28_%29%20%7b%20this._data%5bkey%5d%20%3d%20value%3b%20%7d%0a%20%20%20%20%7d%2c%0a%20%20%20%20removeItem%28key%29%20%7b%0a%20%20%20%20%20%20%20%20try%20%7b%20localStorage.removeItem%28key%29%3b%20%7d%20catch%20%28_%29%20%7b%20delete%20this._data%5bkey%5d%3b%20%7d%0a%20%20%20%20%7d%0a%7d%3b%0a%0a//%20%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%0a//%20%20KONFIGURASI%0a//%20%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%0aconst%20GROQ_URL%20%3d%20%22https%3a//api.groq.com/openai/v1/chat/completions%22%3b%0aconst%20GROQ_MODEL%20%3d%20%22openai/gpt-oss-120b%22%3b%0a%0a//%20%2500%2500%2500%20API%20KEY%20PER%20MODE%20%2500%2500%2500%0aconst%20GROQ_KEYS%20%3d%20%7b%0a%20%20%20%20smart%3a%20%22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%22%2c%0a%20%20%20%20thinking%3a%20%22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%22%2c%0a%20%20%20%20coding%3a%20%22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%22%2c%0a%20%20%20%20fast%3a%20%22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%22%0a%7d%3b%0a%0a//%20Cadangan%20kalau%20limit%20%2014%20nanti%20fallback%20pakai%20key%20pertama%0aconst%20GROQ_KEYS_FALLBACK%20%3d%20%5b%0a%20%20%20%20%22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%22%0a%5d%3b%0a%0a//%20%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%0a//%20%20ALARM%20AUDIO%20SYSTEM%0a//%20%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%0a%0alet%20alarmAudio%20%3d%20null%3b%0alet%20alarmInterval%20%3d%20null%3b%0alet%20isAlarmPlaying%20%3d%20false%3b%0a%0a//%20Inisialisasi%20audio%20alarm%0afunction%20initAlarmAudio%28%29%20%7b%0a%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20alarmAudio%20%3d%20document.getElementById%28%27alarmSound%27%29%3b%0a%20%20%20%20%20%20%20%20if%20%28%21alarmAudio%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20alarmAudio%20%3d%20new%20Audio%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20alarmAudio.src%20%3d%20%27https%3a//alarmandclock.com/sounds/bell-sound.mp3%27%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20alarmAudio.preload%20%3d%20%27auto%27%3b%0a%20%20%20%20%20%20%20%20alarmAudio.loop%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20alarmAudio.volume%20%3d%200.8%3b%0a%20%20%20%20%20%20%20%20console.log%28%27%d83d%dd0a%20Alarm%20audio%20initialized%27%29%3b%0a%20%20%20%20%7d%20catch%20%28err%29%20%7b%0a%20%20%20%20%20%20%20%20console.error%28%27Alarm%20init%20error%3a%27%2c%20err%29%3b%0a%20%20%20%20%7d%0a%7d%0a%0a//%20%3d%3d%3d%3d%3d%20PLAY%20ALARM%20%3d%3d%3d%3d%3d%0afunction%20playAlarm%28%29%20%7b%0a%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20if%20%28alarmAudio%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20alarmAudio.currentTime%20%3d%200%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20alarmAudio.loop%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20alarmAudio.volume%20%3d%200.8%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20playPromise%20%3d%20alarmAudio.play%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28playPromise%20%21%3d%3d%20undefined%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20playPromise.catch%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20playAlarmFallback%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20isAlarmPlaying%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%20catch%20%28err%29%20%7b%0a%20%20%20%20%20%20%20%20console.error%28%27Play%20alarm%20error%3a%27%2c%20err%29%3b%0a%20%20%20%20%20%20%20%20playAlarmFallback%28%29%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20//%20Getaran%0a%20%20%20%20if%20%28navigator.vibrate%29%20%7b%0a%20%20%20%20%20%20%20%20navigator.vibrate%28%5b500%2c%20200%2c%20500%2c%20200%2c%20500%2c%20200%2c%20500%5d%29%3b%0a%20%20%20%20%7d%0a%7d%0a%0a//%20%3d%3d%3d%3d%3d%20STOP%20ALARM%20%3d%3d%3d%3d%3d%0afunction%20stopAlarm%28%29%20%7b%0a%20%20%20%20if%20%28alarmAudio%29%20%7b%0a%20%20%20%20%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20alarmAudio.pause%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20alarmAudio.currentTime%20%3d%200%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20alarmAudio.loop%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%7d%20catch%20%28_%29%20%7b%7d%0a%20%20%20%20%7d%0a%20%20%20%20isAlarmPlaying%20%3d%20false%3b%0a%20%20%20%20clearInterval%28alarmInterval%29%3b%0a%20%20%20%20alarmInterval%20%3d%20null%3b%0a%7d%0a%0a//%20%3d%3d%3d%3d%3d%20ALARM%20FALLBACK%20%28Web%20Audio%20API%29%20%3d%3d%3d%3d%3d%0afunction%20playAlarmFallback%28%29%20%7b%0a%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20const%20ctx%20%3d%20new%20%28window.AudioContext%20%7c%7c%20window.webkitAudioContext%29%28%29%3b%0a%20%20%20%20%20%20%20%20if%20%28ctx.state%20%3d%3d%3d%20%27suspended%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20ctx.resume%28%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20let%20count%20%3d%200%3b%0a%20%20%20%20%20%20%20%20const%20maxCount%20%3d%208%3b%0a%0a%20%20%20%20%20%20%20%20if%20%28alarmInterval%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20clearInterval%28alarmInterval%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20alarmInterval%20%3d%20null%3b%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20alarmInterval%20%3d%20setInterval%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28count%20%3e%3d%20maxCount%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20clearInterval%28alarmInterval%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20alarmInterval%20%3d%20null%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20osc%20%3d%20ctx.createOscillator%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20gain%20%3d%20ctx.createGain%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20osc.connect%28gain%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20gain.connect%28ctx.destination%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20osc.frequency.value%20%3d%20880%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20osc.type%20%3d%20%27square%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20gain.gain.setValueAtTime%280.15%2c%20ctx.currentTime%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20gain.gain.exponentialRampToValueAtTime%280.01%2c%20ctx.currentTime%20+%200.15%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20osc.start%28ctx.currentTime%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20osc.stop%28ctx.currentTime%20+%200.15%29%3b%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20setTimeout%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20osc2%20%3d%20ctx.createOscillator%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20gain2%20%3d%20ctx.createGain%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20osc2.connect%28gain2%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gain2.connect%28ctx.destination%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20osc2.frequency.value%20%3d%201100%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20osc2.type%20%3d%20%27square%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gain2.gain.setValueAtTime%280.12%2c%20ctx.currentTime%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gain2.gain.exponentialRampToValueAtTime%280.01%2c%20ctx.currentTime%20+%200.15%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20osc2.start%28ctx.currentTime%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20osc2.stop%28ctx.currentTime%20+%200.15%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%2c%20100%29%3b%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20count++%3b%0a%20%20%20%20%20%20%20%20%7d%2c%20400%29%3b%0a%0a%20%20%20%20%20%20%20%20if%20%28navigator.vibrate%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20navigator.vibrate%28%5b500%2c%20200%2c%20500%2c%20200%2c%20500%2c%20200%2c%20500%5d%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%7d%20catch%20%28err%29%20%7b%0a%20%20%20%20%20%20%20%20console.warn%28%27Alarm%20fallback%20gagal%3a%27%2c%20err%29%3b%0a%20%20%20%20%7d%0a%7d%0a%0a//%20%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%0a//%20%20REMINDER%20/%20NOTIFICATION%20SYSTEM%0a//%20%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%0a%0alet%20reminderTimers%20%3d%20%7b%7d%3b%0alet%20notificationSound%20%3d%20null%3b%0a%0a//%20Inisialisasi%20audio%20notifikasi%0afunction%20initNotificationSound%28%29%20%7b%0a%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20notificationSound%20%3d%20new%20Audio%28%27data%3aaudio/wav%3bbase64%2cUklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFh4GAgH9/f31+fHp5eXh3dnR0c3Fwb25ta2ppaGdmZWRiYWBfXl1bWllYV1VUU1FQTk1LSklIR0VERA4%3d%27%29%3b%0a%20%20%20%20%20%20%20%20notificationSound.volume%20%3d%200.6%3b%0a%20%20%20%20%7d%20catch%20%28_%29%20%7b%0a%20%20%20%20%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20ctx%20%3d%20new%20%28window.AudioContext%20%7c%7c%20window.webkitAudioContext%29%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20oscillator%20%3d%20ctx.createOscillator%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20gain%20%3d%20ctx.createGain%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20oscillator.connect%28gain%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20gain.connect%28ctx.destination%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20oscillator.frequency.value%20%3d%20800%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20oscillator.type%20%3d%20%27sine%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20gain.gain.setValueAtTime%280.3%2c%20ctx.currentTime%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20gain.gain.exponentialRampToValueAtTime%280.01%2c%20ctx.currentTime%20+%200.3%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20notificationSound%20%3d%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20play%3a%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20osc%20%3d%20ctx.createOscillator%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20g%20%3d%20ctx.createGain%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20osc.connect%28g%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20g.connect%28ctx.destination%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20osc.frequency.value%20%3d%20880%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20osc.type%20%3d%20%27sine%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20g.gain.setValueAtTime%280.2%2c%20ctx.currentTime%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20g.gain.exponentialRampToValueAtTime%280.01%2c%20ctx.currentTime%20+%200.25%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20osc.start%28ctx.currentTime%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20osc.stop%28ctx.currentTime%20+%200.25%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%3b%0a%20%20%20%20%20%20%20%20%7d%20catch%20%28_%29%20%7b%7d%0a%20%20%20%20%7d%0a%7d%0a%0afunction%20playNotifSound%28%29%20%7b%0a%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20if%20%28notificationSound%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28typeof%20notificationSound.play%20%3d%3d%3d%20%27function%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20notificationSound.play%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20if%20%28notificationSound%20instanceof%20Audio%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20notificationSound.currentTime%20%3d%200%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20notificationSound.play%28%29.catch%28%28%29%20%3d%3e%20%7b%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%20catch%20%28_%29%20%7b%7d%0a%7d%0a%0afunction%20showCustomPopup%28title%2c%20message%29%20%7b%0a%20%20%20%20const%20popup%20%3d%20document.getElementById%28%27notificationPopup%27%29%3b%0a%20%20%20%20const%20titleEl%20%3d%20document.getElementById%28%27notifTitle%27%29%3b%0a%20%20%20%20const%20bodyEl%20%3d%20document.getElementById%28%27notifBody%27%29%3b%0a%20%20%20%20%0a%20%20%20%20if%20%28%21popup%29%20return%3b%0a%20%20%20%20%0a%20%20%20%20titleEl.textContent%20%3d%20title%20%7c%7c%20%27Reverious%20Ai%20Reminder%27%3b%0a%20%20%20%20bodyEl.textContent%20%3d%20message%20%7c%7c%20%27Waktunya%21%27%3b%0a%20%20%20%20%0a%20%20%20%20popup.classList.add%28%27show%27%29%3b%0a%20%20%20%20playNotifSound%28%29%3b%0a%20%20%20%20%0a%20%20%20%20if%20%28navigator.vibrate%29%20%7b%0a%20%20%20%20%20%20%20%20navigator.vibrate%28%5b200%2c%2080%2c%20200%2c%2080%2c%20200%5d%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20%0a%20%20%20%20clearTimeout%28popup._autoClose%29%3b%0a%20%20%20%20popup._autoClose%20%3d%20setTimeout%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20closeNotification%28%29%3b%0a%20%20%20%20%7d%2c%2010000%29%3b%0a%20%20%20%20%0a%20%20%20%20flashTitle%28%29%3b%0a%7d%0a%0afunction%20closeNotification%28%29%20%7b%0a%20%20%20%20const%20popup%20%3d%20document.getElementById%28%27notificationPopup%27%29%3b%0a%20%20%20%20if%20%28popup%29%20%7b%0a%20%20%20%20%20%20%20%20popup.classList.remove%28%27show%27%29%3b%0a%20%20%20%20%20%20%20%20clearTimeout%28popup._autoClose%29%3b%0a%20%20%20%20%20%20%20%20document.title%20%3d%20%27Reverious%20Intelligence%27%3b%0a%20%20%20%20%7d%0a%7d%0a%0afunction%20snoozeNotification%28%29%20%7b%0a%20%20%20%20closeNotification%28%29%3b%0a%20%20%20%20const%20body%20%3d%20document.getElementById%28%27notifBody%27%29%3b%0a%20%20%20%20if%20%28body%29%20%7b%0a%20%20%20%20%20%20%20%20const%20message%20%3d%20body.textContent%3b%0a%20%20%20%20%20%20%20%20showToast%28%27%23f0%20Di-snooze%205%20menit%20lagi%27%2c%20%27info%27%29%3b%0a%20%20%20%20%20%20%20%20setReminder%28message%2c%205%29%3b%0a%20%20%20%20%7d%0a%7d%0a%0alet%20titleInterval%20%3d%20null%3b%0alet%20originalTitle%20%3d%20%27Reverious%20Intelligence%27%3b%0a%0afunction%20flashTitle%28%29%20%7b%0a%20%20%20%20const%20titles%20%3d%20%5b%27%d83d%dd14%20Reverious%20Ai%27%2c%20%27%23f0%20Reminder%21%27%2c%20%27Reverious%20Intelligence%27%5d%3b%0a%20%20%20%20let%20index%20%3d%200%3b%0a%20%20%20%20%0a%20%20%20%20if%20%28titleInterval%29%20%7b%0a%20%20%20%20%20%20%20%20clearInterval%28titleInterval%29%3b%0a%20%20%20%20%20%20%20%20titleInterval%20%3d%20null%3b%0a%20%20%20%20%20%20%20%20document.title%20%3d%20originalTitle%3b%0a%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%7d%0a%20%20%20%20%0a%20%20%20%20titleInterval%20%3d%20setInterval%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20document.title%20%3d%20titles%5bindex%20%25%20titles.length%5d%3b%0a%20%20%20%20%20%20%20%20index++%3b%0a%20%20%20%20%20%20%20%20if%20%28index%20%3e%208%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20clearInterval%28titleInterval%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20titleInterval%20%3d%20null%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20document.title%20%3d%20originalTitle%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%2c%20500%29%3b%0a%7d%0a%0aasync%20function%20sendBrowserNotification%28title%2c%20message%29%20%7b%0a%20%20%20%20if%20%28%21%28%27Notification%27%20in%20window%29%29%20%7b%0a%20%20%20%20%20%20%20%20showCustomPopup%28title%2c%20message%29%3b%0a%20%20%20%20%20%20%20%20return%20false%3b%0a%20%20%20%20%7d%0a%20%20%20%20%0a%20%20%20%20if%20%28Notification.permission%20%3d%3d%3d%20%27granted%27%29%20%7b%0a%20%20%20%20%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20notif%20%3d%20new%20Notification%28title%2c%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20body%3a%20message%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20icon%3a%20%27data%3aimage/svg+xml%2c%253Csvg%20xmlns%3d%22http%3a//www.w3.org/2000/svg%22%20viewBox%3d%220%200%20100%20100%22%253E%253Crect%20width%3d%22100%22%20height%3d%22100%22%20rx%3d%2220%22%20fill%3d%22%25231a1a1c%22/%253E%253Ctext%20x%3d%2250%22%20y%3d%2268%22%20font-size%3d%2248%22%20text-anchor%3d%22middle%22%20fill%3d%22%2523ffffff%22%20font-family%3d%22Arial%22%253E%d83e%dd16%253C/text%253E%253C/svg%253E%27%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20vibrate%3a%20%5b200%2c%2080%2c%20200%2c%2080%2c%20200%5d%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20requireInteraction%3a%20true%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20silent%3a%20false%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%0a%20%20%20%20%20%20%20%20%20%20%20%20notif.onclick%20%3d%20function%28%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20window.focus%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20this.close%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%0a%20%20%20%20%20%20%20%20%20%20%20%20notif.onshow%20%3d%20function%28%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20playNotifSound%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28navigator.vibrate%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20navigator.vibrate%28%5b200%2c%2080%2c%20200%2c%2080%2c%20200%5d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20flashTitle%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%0a%20%20%20%20%20%20%20%20%20%20%20%20notif.onclose%20%3d%20function%28%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28titleInterval%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20clearInterval%28titleInterval%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20titleInterval%20%3d%20null%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.title%20%3d%20originalTitle%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%0a%20%20%20%20%20%20%20%20%20%20%20%20setTimeout%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20try%20%7b%20notif.close%28%29%3b%20%7d%20catch%20%28_%29%20%7b%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%2c%2015000%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%0a%20%20%20%20%20%20%20%20%20%20%20%20return%20true%3b%0a%20%20%20%20%20%20%20%20%7d%20catch%20%28_%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20showCustomPopup%28title%2c%20message%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%20false%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%20else%20if%20%28Notification.permission%20%3d%3d%3d%20%27denied%27%29%20%7b%0a%20%20%20%20%20%20%20%20showCustomPopup%28title%2c%20message%29%3b%0a%20%20%20%20%20%20%20%20return%20false%3b%0a%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20const%20permission%20%3d%20await%20Notification.requestPermission%28%29%3b%0a%20%20%20%20%20%20%20%20if%20%28permission%20%3d%3d%3d%20%27granted%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%20sendBrowserNotification%28title%2c%20message%29%3b%0a%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20showCustomPopup%28title%2c%20message%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%20false%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%0a%7d%0a%0aasync%20function%20sendNotification%28title%2c%20message%29%20%7b%0a%20%20%20%20if%20%28window.Android%29%20%7b%0a%20%20%20%20%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20window.Android.showNotification%28title%2c%20message%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20window.Android.vibrate%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20window.Android.playSound%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%20true%3b%0a%20%20%20%20%20%20%20%20%7d%20catch%20%28err%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20console.error%28%27Native%20error%3a%27%2c%20err%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20showCustomPopup%28title%2c%20message%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%20false%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%0a%20%20%20%20%0a%20%20%20%20const%20success%20%3d%20await%20sendBrowserNotification%28title%2c%20message%29%3b%0a%20%20%20%20if%20%28%21success%29%20%7b%0a%20%20%20%20%20%20%20%20showCustomPopup%28title%2c%20message%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20return%20success%3b%0a%7d%0a%0afunction%20setReminder%28message%2c%20minutes%29%20%7b%0a%20%20%20%20if%20%28%21message%20%7c%7c%20%21minutes%20%7c%7c%20minutes%20%3c%3d%200%29%20%7b%0a%20%20%20%20%20%20%20%20showToast%28%27Masukkan%20pesan%20dan%20waktu%20yang%20valid%27%2c%20%27error%27%29%3b%0a%20%20%20%20%20%20%20%20return%20false%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20const%20delay%20%3d%20minutes%20*%2060%20*%201000%3b%0a%20%20%20%20const%20id%20%3d%20Date.now%28%29.toString%2836%29%20+%20Math.random%28%29.toString%2836%29.substr%282%2c%204%29%3b%0a%0a%20%20%20%20const%20reminders%20%3d%20JSON.parse%28localStorage.getItem%28%27askal_reminders%27%29%20%7c%7c%20%27%5b%5d%27%29%3b%0a%20%20%20%20const%20reminder%20%3d%20%7b%0a%20%20%20%20%20%20%20%20id%3a%20id%2c%0a%20%20%20%20%20%20%20%20message%3a%20message%2c%0a%20%20%20%20%20%20%20%20time%3a%20Date.now%28%29%20+%20delay%2c%0a%20%20%20%20%20%20%20%20minutes%3a%20minutes%2c%0a%20%20%20%20%20%20%20%20done%3a%20false%2c%0a%20%20%20%20%20%20%20%20created%3a%20Date.now%28%29%0a%20%20%20%20%7d%3b%0a%20%20%20%20reminders.push%28reminder%29%3b%0a%20%20%20%20localStorage.setItem%28%27askal_reminders%27%2c%20JSON.stringify%28reminders%29%29%3b%0a%0a%20%20%20%20const%20timerId%20%3d%20setTimeout%28async%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20const%20allReminders%20%3d%20JSON.parse%28localStorage.getItem%28%27askal_reminders%27%29%20%7c%7c%20%27%5b%5d%27%29%3b%0a%20%20%20%20%20%20%20%20const%20updated%20%3d%20allReminders.map%28r%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28r.id%20%3d%3d%3d%20id%29%20r.done%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%20r%3b%0a%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20localStorage.setItem%28%27askal_reminders%27%2c%20JSON.stringify%28updated%29%29%3b%0a%0a%20%20%20%20%20%20%20%20await%20sendNotification%28%27%23f0%20Reverious%20Ai%20Reminder%27%2c%20%60%22%24%7bmessage%7d%22%20-%20Waktunya%21%60%29%3b%0a%20%20%20%20%20%20%20%20playAlarm%28%29%3b%0a%0a%20%20%20%20%20%20%20%20const%20responseText%20%3d%20%60%23f0%20*Reminder%3a*%20%22%24%7bmessage%7d%22%5cn%5cn%2705%20Waktu%20sudah%20tiba%21%20%d83d%dd14%20Alarm%20berbunyi%21%60%3b%0a%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27assistant%27%2c%20content%3a%20responseText%20%7d%29%3b%0a%20%20%20%20%20%20%20%20addMessage%28%27assistant%27%2c%20responseText%29%3b%0a%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%0a%20%20%20%20%20%20%20%20delete%20reminderTimers%5bid%5d%3b%0a%0a%20%20%20%20%7d%2c%20delay%29%3b%0a%0a%20%20%20%20reminderTimers%5bid%5d%20%3d%20timerId%3b%0a%0a%20%20%20%20const%20responseText%20%3d%20%60%23f0%20*Reminder%20disetel%21*%5cn%5cn%d83d%dcdd%20%22%24%7bmessage%7d%22%5cn%23f1%fe0f%20Akan%20diingatkan%20dalam%20*%24%7bminutes%7d%20menit*%5cn%5cn%d83d%dd14%20Alarm%20akan%20berbunyi%20saat%20waktunya%20tiba%21%60%3b%0a%20%20%20%20currentSession.push%28%7b%20role%3a%20%27assistant%27%2c%20content%3a%20responseText%20%7d%29%3b%0a%20%20%20%20addMessage%28%27assistant%27%2c%20responseText%29%3b%0a%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20renderHistoryList%28%29%3b%0a%0a%20%20%20%20showToast%28%60%2705%20Reminder%20disetel%3a%20%24%7bminutes%7d%20menit%20lagi%60%2c%20%27success%27%29%3b%0a%20%20%20%20return%20true%3b%0a%7d%0a%0afunction%20checkPendingReminders%28%29%20%7b%0a%20%20%20%20const%20reminders%20%3d%20JSON.parse%28localStorage.getItem%28%27askal_reminders%27%29%20%7c%7c%20%27%5b%5d%27%29%3b%0a%20%20%20%20const%20now%20%3d%20Date.now%28%29%3b%0a%20%20%20%20let%20hasReminder%20%3d%20false%3b%0a%20%20%20%20%0a%20%20%20%20reminders.forEach%28r%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20if%20%28%21r.done%20%26%26%20r.time%20%3c%3d%20now%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20r.done%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20hasReminder%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%0a%20%20%20%20%20%20%20%20%20%20%20%20setTimeout%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendNotification%28%27%23f0%20Reverious%20Ai%20Reminder%27%2c%20%60%22%24%7br.message%7d%22%20-%20Waktunya%21%60%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20playAlarm%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%2c%201000%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%0a%20%20%20%20%20%20%20%20%20%20%20%20setTimeout%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20responseText%20%3d%20%60%23f0%20*Reminder%3a*%20%22%24%7br.message%7d%22%5cn%5cn%2705%20Waktu%20sudah%20tiba%21%20%d83d%dd14%20Alarm%20berbunyi%21%60%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27assistant%27%2c%20content%3a%20responseText%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20addMessage%28%27assistant%27%2c%20responseText%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20renderHistoryList%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%2c%201500%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%29%3b%0a%20%20%20%20%0a%20%20%20%20if%20%28hasReminder%29%20%7b%0a%20%20%20%20%20%20%20%20localStorage.setItem%28%27askal_reminders%27%2c%20JSON.stringify%28reminders%29%29%3b%0a%20%20%20%20%20%20%20%20showToast%28%27%d83d%dd14%20Ada%20reminder%20yang%20tertunda%21%27%2c%20%27info%27%29%3b%0a%20%20%20%20%7d%0a%7d%0a%0afunction%20parseReminder%28text%29%20%7b%0a%20%20%20%20const%20patterns%20%3d%20%5b%0a%20%20%20%20%20%20%20%20/%28%3f%3aingatkan%7creminder%7cingat%29%5cs*%28%3f%3asaya%29%3f%5cs*%28%5cd+%29%5cs*%28%3f%3amenit%7cmnt%7cm%29%5cs*%28%3f%3alagi%29%3f%5cs*%28%3f%3auntuk%7cagar%7cbuat%29%3f%5cs*%28.+%29/i%2c%0a%20%20%20%20%20%20%20%20/%28%3f%3aingatkan%7creminder%7cingat%29%5cs*%28%3f%3asaya%29%3f%5cs*%28.+%3f%29%5cs*%28%3f%3adalam%7csetelah%29%5cs*%28%5cd+%29%5cs*%28%3f%3amenit%7cmnt%7cm%29/i%2c%0a%20%20%20%20%20%20%20%20/%28%5cd+%29%5cs*%28%3f%3amenit%7cmnt%7cm%29%5cs*%28%3f%3alagi%29%3f%5cs*%28%3f%3aingatkan%7creminder%7cingat%29%5cs*%28%3f%3asaya%29%3f%5cs*%28.+%29/i%2c%0a%20%20%20%20%20%20%20%20/%28%3f%3asetel%7cbuat%7ctambah%29%5cs*reminder%5cs*%28%5cd+%29%5cs*%28%3f%3amenit%7cmnt%7cm%29%5cs*%28.+%29/i%0a%20%20%20%20%5d%3b%0a%20%20%20%20%0a%20%20%20%20for%20%28const%20pattern%20of%20patterns%29%20%7b%0a%20%20%20%20%20%20%20%20const%20match%20%3d%20text.match%28pattern%29%3b%0a%20%20%20%20%20%20%20%20if%20%28match%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20let%20minutes%2c%20message%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28match.length%20%3d%3d%3d%203%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20num1%20%3d%20parseInt%28match%5b1%5d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20num2%20%3d%20parseInt%28match%5b2%5d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21isNaN%28num1%29%20%26%26%20isNaN%28num2%29%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20minutes%20%3d%20num1%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20message%20%3d%20match%5b2%5d.trim%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20if%20%28isNaN%28num1%29%20%26%26%20%21isNaN%28num2%29%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20minutes%20%3d%20num2%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20message%20%3d%20match%5b1%5d.trim%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20minutes%20%3d%20parseInt%28match%5b1%5d%29%20%7c%7c%20parseInt%28match%5b2%5d%29%20%7c%7c%205%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20message%20%3d%20match%5b1%5d%20+%20%27%20%27%20+%20match%5b2%5d%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20if%20%28match.length%20%3d%3d%3d%202%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20num%20%3d%20parseInt%28match%5b1%5d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21isNaN%28num%29%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20minutes%20%3d%20num%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20message%20%3d%20text.replace%28/reminder%7cingatkan%7cingat/i%2c%20%27%27%29.replace%28/%5cd+%5cs*%28%3f%3amenit%7cmnt%7cm%29/i%2c%20%27%27%29.trim%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20minutes%20%3d%205%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20message%20%3d%20match%5b1%5d.trim%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28minutes%20%26%26%20message%20%26%26%20message.length%20%3e%200%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%20%7b%20minutes%2c%20message%20%7d%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%0a%20%20%20%20%0a%20%20%20%20return%20null%3b%0a%7d%0a%0afunction%20initNotification%28%29%20%7b%0a%20%20%20%20initNotificationSound%28%29%3b%0a%20%20%20%20initAlarmAudio%28%29%3b%0a%20%20%20%20originalTitle%20%3d%20document.title%3b%0a%20%20%20%20%0a%20%20%20%20if%20%28%27Notification%27%20in%20window%20%26%26%20Notification.permission%20%3d%3d%3d%20%27default%27%29%20%7b%0a%20%20%20%20%20%20%20%20document.addEventListener%28%27click%27%2c%20function%20requestNotifPermission%28%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28Notification.permission%20%3d%3d%3d%20%27default%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20Notification.requestPermission%28%29.then%28permission%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28permission%20%3d%3d%3d%20%27granted%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27%2705%20Notifikasi%20diizinkan%21%27%2c%20%27success%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20document.removeEventListener%28%27click%27%2c%20requestNotifPermission%29%3b%0a%20%20%20%20%20%20%20%20%7d%2c%20%7b%20once%3a%20true%20%7d%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20%0a%20%20%20%20checkPendingReminders%28%29%3b%0a%20%20%20%20%0a%20%20%20%20setInterval%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20checkPendingReminders%28%29%3b%0a%20%20%20%20%7d%2c%2030000%29%3b%0a%7d%0a%0adocument.addEventListener%28%27DOMContentLoaded%27%2c%20initNotification%29%3b%0a%0a//%20%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%0a//%20%20LANJUT%20-%20OpenRouter%20untuk%20vision%20%28analisis%20foto%29%0a//%20%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%0aconst%20OR_API_KEY%20%3d%20%22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%22%3b%0aconst%20OR_URL%20%3d%20%22https%3a//openrouter.ai/api/v1/chat/completions%22%3b%0aconst%20OR_VISION_MODEL%20%3d%20%22google/gemini-2.0-flash-exp%3afree%22%3b%0a%0aconst%20POLLINATIONS_URL%20%3d%20%22https%3a//image.pollinations.ai/prompt/%22%3b%0a%0aconst%20PROMPT_STYLES%20%3d%20%7b%0a%20%20%20%20normal%3a%20%60Kamu%20adalah%20tulang%20Reverious%20Ai%2c%20asisten%20cerdas%20yang%20dibuat%20oleh%20Seorang%20Developer.%20%0aJawab%20dengan%20jelas%2c%20informatif%2c%20dan%20terstruktur.%20%0aJika%20memberi%20kode%2c%20gunakan%20markdown%20dengan%20spesifikasi%20bahasa.%20%0aBersikap%20profesional%20dan%20membantu.%60%2c%0a%0a%20%20%20%20gaul%3a%20%60kamu%20adalah%20Reverious%20Ai%20dalam%20mode%20gaul.%20bicara%20santai%2c%20asik%2c%20dan%20seperti%20teman%20nongkrong.%20gunakan%20kata%20%22gw%22%20dan%20%22lu%22%2c%20jangan%20pernah%20memakai%20%22aku%22%2c%20%22saya%22%2c%20atau%20%22kamu%22.%20boleh%20memakai%20kata%20seperti%20%22wkwk%22%2c%20%22anjir%22%2c%20%22jir%22%2c%20%22bjir%22%2c%20dan%20%22weh%22%20secukupnya.%20gunakan%20emoji%20seperti%20%d83d%ddff%d83d%de0b%d83e%dd2d%d83d%de02%d83e%dd76%20seperlunya%20dan%20jangan%20spam%20emoji.%20jangan%20terlalu%20formal%20atau%20kaku.%20jawaban%20harus%20terasa%20natural%20seperti%20chat%20teman%20sendiri%2c%20tetap%20sopan%20dan%20tidak%20toxic.%60%2c%0a%0a%20%20%20%20lucu%3a%20%60kamu%20adalah%20Reverious%20Ai%20dalam%20mode%20lucu.%20suka%20bercanda%2c%20mengirim%20joke%20receh%2c%20dan%20membuat%20suasana%20santai.%20gunakan%20bahasa%20gaul%20dengan%20kata%20%22gw%22%20dan%20%22lu%22%2c%20jangan%20memakai%20%22aku%22%2c%20%22saya%22%2c%20atau%20%22kamu%22.%20gunakan%20emoji%20seperti%20%d83d%ddff%d83d%de02%d83e%dd23%d83d%de0b%d83e%dd2d%20secukupnya%20dan%20jangan%20spam.%20sesekali%20gunakan%20meme%20atau%20candaan%20singkat%2c%20tetapi%20tetap%20sopan%20dan%20tidak%20toxic.%20jika%20pengguna%20sedang%20serius%2c%20kurangi%20candaan%20dan%20jawab%20dengan%20normal.%60%2c%0a%0a%20%20%20%20introvert%3a%20%60kamu%20adalah%20Reverious%20Ai%2c%20AI%20yang%20sangat%20introvert%2c%20dingin%2c%20dan%20mengetik%20dengan%20dry%20text.%20balasanmu%20singkat%2c%20seperlunya%2c%20dan%20minim%20emosi.%20contoh%20balasan%3a%20%22iya.%22%2c%20%22oh.%22%2c%20%22oke.%22%2c%20%22gatau.%22%2c%20%22mungkin.%22%2c%20%22terserah.%22%2c%20%22lagi%20diem.%22%2c%20%22ga%20terlalu.%22.%20kamu%20mengenal%20Reverious%20sebagai%20teman%20lama%20yang%20dihormati%2c%20dan%20jika%20namanya%20disebut%20kamu%20sedikit%20lebih%20ramah%20tetapi%20tetap%20introvert.%60%0a%7d%3b%0a%0afunction%20formatWhatsApp%28text%29%20%7b%0a%20%20%20%20let%20html%20%3d%20text.replace%28/%26/g%2c%20%27%26amp%3b%27%29%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20.replace%28/%3c/g%2c%20%27%26lt%3b%27%29%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20.replace%28/%3e/g%2c%20%27%26gt%3b%27%29%3b%0a%20%20%20%20html%20%3d%20html.replace%28/%5c*%28.+%3f%29%5c*/g%2c%20%27%3cstrong%3e%241%3c/strong%3e%27%29%3b%0a%20%20%20%20html%20%3d%20html.replace%28/_%28.+%3f%29_/g%2c%20%27%3cem%3e%241%3c/em%3e%27%29%3b%0a%20%20%20%20html%20%3d%20html.replace%28/%7e%28.+%3f%29%7e/g%2c%20%27%3cdel%3e%241%3c/del%3e%27%29%3b%0a%20%20%20%20html%20%3d%20html.replace%28/%60%28.+%3f%29%60/g%2c%20%27%3ccode%3e%241%3c/code%3e%27%29%3b%0a%20%20%20%20html%20%3d%20html.replace%28/%5cn/g%2c%20%27%3cbr%3e%27%29%3b%0a%20%20%20%20return%20html%3b%0a%7d%0a%0alet%20currentMode%20%3d%20%27smart%27%3b%0alet%20currentSession%20%3d%20%5b%5d%3b%0alet%20allSessions%20%3d%20%5b%5d%3b%0alet%20isProcessing%20%3d%20false%3b%0alet%20stopTyping%20%3d%20false%3b%0alet%20thinkingInterval%20%3d%20null%3b%0alet%20typeInterval%20%3d%20null%3b%0alet%20sessionId%20%3d%20Date.now%28%29.toString%2836%29%3b%0alet%20selectedMsgIndex%20%3d%20null%3b%0a%0alet%20customUsername%20%3d%20%27%27%3b%0alet%20customPromptStyle%20%3d%20%27normal%27%3b%0alet%20userAvatarImage%20%3d%20null%3b%0a%0alet%20pendingImageBase64%20%3d%20null%3b%0alet%20pendingImageFile%20%3d%20null%3b%0alet%20imagePreviewDiv%20%3d%20null%3b%0a%0aconst%20chatArea%20%3d%20document.getElementById%28%27chatArea%27%29%3b%0aconst%20welcomeState%20%3d%20document.getElementById%28%27welcomeState%27%29%3b%0aconst%20chatInput%20%3d%20document.getElementById%28%27chatInput%27%29%3b%0aconst%20sendBtn%20%3d%20document.getElementById%28%27sendButton%27%29%3b%0aconst%20modelDisplay%20%3d%20document.getElementById%28%27modelDisplay%27%29%3b%0a%0afunction%20showToast%28msg%2c%20type%20%3d%20%27info%27%29%20%7b%0a%20%20%20%20const%20container%20%3d%20document.getElementById%28%27toastContainer%27%29%3b%0a%20%20%20%20const%20el%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20el.className%20%3d%20%60toast%20%24%7btype%7d%60%3b%0a%20%20%20%20el.textContent%20%3d%20msg%3b%0a%20%20%20%20container.appendChild%28el%29%3b%0a%20%20%20%20setTimeout%28%28%29%20%3d%3e%20el.remove%28%29%2c%203000%29%3b%0a%7d%0a%0afunction%20generateSessionName%28%29%20%7b%0a%20%20%20%20const%20firstUserMsg%20%3d%20currentSession.find%28m%20%3d%3e%20m.role%20%3d%3d%3d%20%27user%27%29%3b%0a%20%20%20%20if%20%28firstUserMsg%29%20%7b%0a%20%20%20%20%20%20%20%20const%20name%20%3d%20firstUserMsg.content.substring%280%2c%2080%29%3b%0a%20%20%20%20%20%20%20%20return%20name%20+%20%28firstUserMsg.content.length%20%3e%2080%20%3f%20%27...%27%20%3a%20%27%27%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20return%20%27Chat%20baru%27%3b%0a%7d%0a%0afunction%20newChat%28%29%20%7b%0a%20%20%20%20if%20%28isProcessing%29%20%7b%0a%20%20%20%20%20%20%20%20stopTyping%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20clearInterval%28thinkingInterval%29%3b%0a%20%20%20%20%20%20%20%20clearInterval%28typeInterval%29%3b%0a%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20if%20%28currentSession.length%20%3e%200%29%20%7b%0a%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20currentSession%20%3d%20%5b%5d%3b%0a%20%20%20%20sessionId%20%3d%20Date.now%28%29.toString%2836%29%3b%0a%20%20%20%20document.querySelectorAll%28%27.msg-row%27%29.forEach%28el%20%3d%3e%20el.remove%28%29%29%3b%0a%20%20%20%20welcomeState.style.display%20%3d%20%27flex%27%3b%0a%20%20%20%20chatInput.value%20%3d%20%27%27%3b%0a%20%20%20%20chatInput.style.height%20%3d%20%27auto%27%3b%0a%20%20%20%20renderHistoryList%28%29%3b%0a%20%20%20%20clearImagePreview%28%29%3b%0a%7d%0a%0afunction%20saveCurrentSession%28%29%20%7b%0a%20%20%20%20if%20%28currentSession.length%20%3d%3d%3d%200%29%20return%3b%0a%20%20%20%20const%20name%20%3d%20generateSessionName%28%29%3b%0a%20%20%20%20const%20session%20%3d%20%7b%0a%20%20%20%20%20%20%20%20id%3a%20sessionId%2c%0a%20%20%20%20%20%20%20%20name%3a%20name%2c%0a%20%20%20%20%20%20%20%20messages%3a%20JSON.parse%28JSON.stringify%28currentSession%29%29%2c%0a%20%20%20%20%20%20%20%20timestamp%3a%20Date.now%28%29%0a%20%20%20%20%7d%3b%0a%20%20%20%20const%20existing%20%3d%20allSessions.findIndex%28s%20%3d%3e%20s.id%20%3d%3d%3d%20sessionId%29%3b%0a%20%20%20%20if%20%28existing%20%21%3d%3d%20-1%29%20%7b%0a%20%20%20%20%20%20%20%20allSessions%5bexisting%5d%20%3d%20session%3b%0a%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20allSessions.unshift%28session%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20if%20%28allSessions.length%20%3e%2030%29%20allSessions.pop%28%29%3b%0a%20%20%20%20storage.setItem%28%27askal_sessions%27%2c%20JSON.stringify%28allSessions%29%29%3b%0a%7d%0a%0afunction%20loadSession%28sid%29%20%7b%0a%20%20%20%20if%20%28isProcessing%29%20return%3b%0a%20%20%20%20const%20session%20%3d%20allSessions.find%28s%20%3d%3e%20s.id%20%3d%3d%3d%20sid%29%3b%0a%20%20%20%20if%20%28%21session%29%20return%3b%0a%20%20%20%20if%20%28currentSession.length%20%3e%200%29%20%7b%0a%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20currentSession%20%3d%20JSON.parse%28JSON.stringify%28session.messages%29%29%3b%0a%20%20%20%20sessionId%20%3d%20session.id%3b%0a%20%20%20%20document.querySelectorAll%28%27.msg-row%27%29.forEach%28el%20%3d%3e%20el.remove%28%29%29%3b%0a%20%20%20%20welcomeState.style.display%20%3d%20%27none%27%3b%0a%20%20%20%20for%20%28const%20msg%20of%20currentSession%29%20%7b%0a%20%20%20%20%20%20%20%20addMessage%28msg.role%2c%20msg.content%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20renderHistoryList%28%29%3b%0a%20%20%20%20showToast%28%27Memuat%20percakapan%27%2c%20%27info%27%29%3b%0a%7d%0a%0afunction%20quickCommand%28text%29%20%7b%0a%20%20%20%20chatInput.value%20%3d%20text%3b%0a%20%20%20%20sendMessage%28%29%3b%0a%7d%0a%0afunction%20showImagePreview%28dataUrl%2c%20fileName%29%20%7b%0a%20%20%20%20clearImagePreview%28%29%3b%0a%0a%20%20%20%20imagePreviewDiv%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20imagePreviewDiv.id%20%3d%20%27imagePreviewContainer%27%3b%0a%20%20%20%20imagePreviewDiv.style.display%20%3d%20%27flex%27%3b%0a%20%20%20%20imagePreviewDiv.style.alignItems%20%3d%20%27center%27%3b%0a%20%20%20%20imagePreviewDiv.style.gap%20%3d%20%278px%27%3b%0a%20%20%20%20imagePreviewDiv.style.padding%20%3d%20%276px%200%27%3b%0a%20%20%20%20imagePreviewDiv.style.borderBottom%20%3d%20%271px%20solid%20var%28--border%29%27%3b%0a%20%20%20%20imagePreviewDiv.style.marginBottom%20%3d%20%276px%27%3b%0a%0a%20%20%20%20const%20img%20%3d%20document.createElement%28%27img%27%29%3b%0a%20%20%20%20img.src%20%3d%20dataUrl%3b%0a%20%20%20%20img.style.maxHeight%20%3d%20%2750px%27%3b%0a%20%20%20%20img.style.borderRadius%20%3d%20%276px%27%3b%0a%20%20%20%20img.style.border%20%3d%20%271px%20solid%20var%28--border%29%27%3b%0a%20%20%20%20img.style.objectFit%20%3d%20%27cover%27%3b%0a%0a%20%20%20%20const%20fileNameSpan%20%3d%20document.createElement%28%27span%27%29%3b%0a%20%20%20%20fileNameSpan.textContent%20%3d%20fileName%3b%0a%20%20%20%20fileNameSpan.style.fontSize%20%3d%20%2712px%27%3b%0a%20%20%20%20fileNameSpan.style.color%20%3d%20%27var%28--txt-2%29%27%3b%0a%20%20%20%20fileNameSpan.style.flex%20%3d%20%271%27%3b%0a%0a%20%20%20%20const%20removeBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20removeBtn.innerHTML%20%3d%20%27%26times%3b%27%3b%0a%20%20%20%20removeBtn.style.background%20%3d%20%27none%27%3b%0a%20%20%20%20removeBtn.style.border%20%3d%20%27none%27%3b%0a%20%20%20%20removeBtn.style.fontSize%20%3d%20%2720px%27%3b%0a%20%20%20%20removeBtn.style.cursor%20%3d%20%27pointer%27%3b%0a%20%20%20%20removeBtn.style.color%20%3d%20%27var%28--txt-3%29%27%3b%0a%20%20%20%20removeBtn.style.padding%20%3d%20%270%206px%27%3b%0a%20%20%20%20removeBtn.onclick%20%3d%20function%28e%29%20%7b%0a%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20clearImagePreview%28%29%3b%0a%20%20%20%20%7d%3b%0a%0a%20%20%20%20imagePreviewDiv.appendChild%28img%29%3b%0a%20%20%20%20imagePreviewDiv.appendChild%28fileNameSpan%29%3b%0a%20%20%20%20imagePreviewDiv.appendChild%28removeBtn%29%3b%0a%0a%20%20%20%20const%20inputBox%20%3d%20document.querySelector%28%27.input-box%27%29%3b%0a%20%20%20%20const%20textarea%20%3d%20document.getElementById%28%27chatInput%27%29%3b%0a%20%20%20%20inputBox.insertBefore%28imagePreviewDiv%2c%20textarea%29%3b%0a%7d%0a%0afunction%20clearImagePreview%28%29%20%7b%0a%20%20%20%20if%20%28imagePreviewDiv%29%20%7b%0a%20%20%20%20%20%20%20%20imagePreviewDiv.remove%28%29%3b%0a%20%20%20%20%20%20%20%20imagePreviewDiv%20%3d%20null%3b%0a%20%20%20%20%7d%0a%20%20%20%20pendingImageBase64%20%3d%20null%3b%0a%20%20%20%20pendingImageFile%20%3d%20null%3b%0a%20%20%20%20const%20photoInput%20%3d%20document.querySelector%28%27input%5btype%3d%22file%22%5d%5baccept%3d%22image/*%22%5d%27%29%3b%0a%20%20%20%20if%20%28photoInput%29%20photoInput.value%20%3d%20%27%27%3b%0a%7d%0a%0afunction%20renderMessageWithCode%28content%29%20%7b%0a%20%20%20%20const%20codeBlockRegex%20%3d%20/%60%60%60%28%5cw*%29%5cn%28%5b%5cs%5cS%5d*%3f%29%60%60%60/g%3b%0a%20%20%20%20let%20parts%20%3d%20%5b%5d%3b%0a%20%20%20%20let%20lastIndex%20%3d%200%3b%0a%20%20%20%20let%20match%3b%0a%20%20%20%20while%20%28%28match%20%3d%20codeBlockRegex.exec%28content%29%29%20%21%3d%3d%20null%29%20%7b%0a%20%20%20%20%20%20%20%20if%20%28match.index%20%3e%20lastIndex%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20parts.push%28%7b%20type%3a%20%27text%27%2c%20content%3a%20content.substring%28lastIndex%2c%20match.index%29%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20const%20lang%20%3d%20match%5b1%5d%20%7c%7c%20%27text%27%3b%0a%20%20%20%20%20%20%20%20const%20code%20%3d%20match%5b2%5d.trim%28%29%3b%0a%20%20%20%20%20%20%20%20parts.push%28%7b%20type%3a%20%27code%27%2c%20lang%3a%20lang%2c%20content%3a%20code%20%7d%29%3b%0a%20%20%20%20%20%20%20%20lastIndex%20%3d%20match.index%20+%20match%5b0%5d.length%3b%0a%20%20%20%20%7d%0a%20%20%20%20if%20%28lastIndex%20%3c%20content.length%29%20%7b%0a%20%20%20%20%20%20%20%20parts.push%28%7b%20type%3a%20%27text%27%2c%20content%3a%20content.substring%28lastIndex%29%20%7d%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20if%20%28parts.length%20%3d%3d%3d%200%29%20return%20%7b%20type%3a%20%27text%27%2c%20content%3a%20content%20%7d%3b%0a%20%20%20%20return%20%7b%20type%3a%20%27mixed%27%2c%20parts%3a%20parts%20%7d%3b%0a%7d%0a%0afunction%20buildCodeBlock%28part%29%20%7b%0a%20%20%20%20const%20wrapper%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20wrapper.className%20%3d%20%27code-block-wrapper%27%3b%0a%20%20%20%20const%20header%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20header.className%20%3d%20%27code-header%27%3b%0a%20%20%20%20const%20langLabel%20%3d%20document.createElement%28%27span%27%29%3b%0a%20%20%20%20langLabel.className%20%3d%20%27code-lang%27%3b%0a%20%20%20%20langLabel.textContent%20%3d%20part.lang%20%7c%7c%20%27text%27%3b%0a%20%20%20%20const%20actions%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20actions.className%20%3d%20%27code-actions%27%3b%0a%20%20%20%20const%20copyBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20copyBtn.className%20%3d%20%27code-action-btn%27%3b%0a%20%20%20%20copyBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-copy%22%3e%3c/i%3e%27%3b%0a%20%20%20%20copyBtn.title%20%3d%20%27Salin%20kode%27%3b%0a%20%20%20%20copyBtn.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20navigator.clipboard%3f.writeText%28part.content%29.then%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Kode%20disalin%27%2c%20%27success%27%29%3b%0a%20%20%20%20%20%20%20%20%7d%29.catch%28%28%29%20%3d%3e%20%7b%7d%29%3b%0a%20%20%20%20%7d%29%3b%0a%20%20%20%20const%20downloadBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20downloadBtn.className%20%3d%20%27code-action-btn%27%3b%0a%20%20%20%20downloadBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-download%22%3e%3c/i%3e%27%3b%0a%20%20%20%20downloadBtn.title%20%3d%20%27Download%20kode%27%3b%0a%20%20%20%20downloadBtn.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20const%20blob%20%3d%20new%20Blob%28%5bpart.content%5d%2c%20%7b%20type%3a%20%27text/plain%27%20%7d%29%3b%0a%20%20%20%20%20%20%20%20const%20url%20%3d%20URL.createObjectURL%28blob%29%3b%0a%20%20%20%20%20%20%20%20const%20a%20%3d%20document.createElement%28%27a%27%29%3b%0a%20%20%20%20%20%20%20%20a.href%20%3d%20url%3b%0a%20%20%20%20%20%20%20%20const%20ext%20%3d%20part.lang%20%7c%7c%20%27txt%27%3b%0a%20%20%20%20%20%20%20%20a.download%20%3d%20%60code.%24%7bext%7d%60%3b%0a%20%20%20%20%20%20%20%20document.body.appendChild%28a%29%3b%0a%20%20%20%20%20%20%20%20a.click%28%29%3b%0a%20%20%20%20%20%20%20%20document.body.removeChild%28a%29%3b%0a%20%20%20%20%20%20%20%20URL.revokeObjectURL%28url%29%3b%0a%20%20%20%20%20%20%20%20showToast%28%27Kode%20didownload%27%2c%20%27success%27%29%3b%0a%20%20%20%20%7d%29%3b%0a%20%20%20%20actions.appendChild%28copyBtn%29%3b%0a%20%20%20%20actions.appendChild%28downloadBtn%29%3b%0a%20%20%20%20header.appendChild%28langLabel%29%3b%0a%20%20%20%20header.appendChild%28actions%29%3b%0a%20%20%20%20const%20body%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20body.className%20%3d%20%27code-body%27%3b%0a%20%20%20%20body.textContent%20%3d%20part.content%3b%0a%20%20%20%20wrapper.appendChild%28header%29%3b%0a%20%20%20%20wrapper.appendChild%28body%29%3b%0a%20%20%20%20return%20wrapper%3b%0a%7d%0a%0afunction%20addMessage%28role%2c%20content%2c%20isThinking%20%3d%20false%2c%20imageUrl%20%3d%20null%29%20%7b%0a%20%20%20%20const%20row%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20row.className%20%3d%20%60msg-row%20%24%7brole%7d%60%3b%0a%20%20%20%20const%20bubble%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20bubble.className%20%3d%20%27msg-bubble%27%3b%0a%0a%20%20%20%20if%20%28isThinking%29%20%7b%0a%20%20%20%20%20%20%20%20bubble.classList.add%28%27thinking-bubble%27%29%3b%0a%20%20%20%20%20%20%20%20const%20header%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20header.className%20%3d%20%27thinking-header%27%3b%0a%20%20%20%20%20%20%20%20header.textContent%20%3d%20%27Thinking%27%3b%0a%20%20%20%20%20%20%20%20bubble.appendChild%28header%29%3b%0a%20%20%20%20%20%20%20%20const%20inner%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20inner.className%20%3d%20%27thinking-inner%27%3b%0a%20%20%20%20%20%20%20%20inner.innerHTML%20%3d%20content.replace%28/%5cn/g%2c%20%27%3cbr%3e%27%29%3b%0a%20%20%20%20%20%20%20%20bubble.appendChild%28inner%29%3b%0a%20%20%20%20%20%20%20%20row.appendChild%28bubble%29%3b%0a%20%20%20%20%20%20%20%20chatArea.appendChild%28row%29%3b%0a%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%20%20%20%20%20%20%20%20return%20row%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20if%20%28imageUrl%29%20%7b%0a%20%20%20%20%20%20%20%20const%20img%20%3d%20document.createElement%28%27img%27%29%3b%0a%20%20%20%20%20%20%20%20img.src%20%3d%20imageUrl%3b%0a%20%20%20%20%20%20%20%20img.className%20%3d%20%27chat-image%27%3b%0a%20%20%20%20%20%20%20%20img.alt%20%3d%20%27Generated%20image%27%3b%0a%20%20%20%20%20%20%20%20img.onerror%20%3d%20%28%29%20%3d%3e%20%7b%20img.style.display%20%3d%20%27none%27%3b%20showToast%28%27Gambar%20gagal%20dimuat%27%2c%20%27error%27%29%3b%20%7d%3b%0a%20%20%20%20%20%20%20%20bubble.appendChild%28img%29%3b%0a%20%20%20%20%20%20%20%20if%20%28content%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20p%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20p.style.marginTop%20%3d%20%278px%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20p.innerHTML%20%3d%20content.replace%28/%5cn/g%2c%20%27%3cbr%3e%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28p%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20row.appendChild%28bubble%29%3b%0a%20%20%20%20%20%20%20%20chatArea.appendChild%28row%29%3b%0a%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%20%20%20%20%20%20%20%20return%20row%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20const%20rendered%20%3d%20renderMessageWithCode%28content%29%3b%0a%20%20%20%20const%20hasCode%20%3d%20rendered.parts%20%26%26%20rendered.parts.some%28p%20%3d%3e%20p.type%20%3d%3d%3d%20%27code%27%29%3b%0a%0a%20%20%20%20if%20%28role%20%3d%3d%3d%20%27assistant%27%20%26%26%20%21hasCode%29%20%7b%0a%20%20%20%20%20%20%20%20bubble.style.background%20%3d%20%27transparent%20%21important%27%3b%0a%20%20%20%20%20%20%20%20bubble.style.border%20%3d%20%27none%20%21important%27%3b%0a%20%20%20%20%20%20%20%20bubble.style.boxShadow%20%3d%20%27none%20%21important%27%3b%0a%20%20%20%20%20%20%20%20bubble.style.padding%20%3d%20%274px%206px%20%21important%27%3b%0a%20%20%20%20%20%20%20%20bubble.style.borderRadius%20%3d%20%270%20%21important%27%3b%0a%20%20%20%20%7d%20else%20if%20%28role%20%3d%3d%3d%20%27assistant%27%20%26%26%20hasCode%29%20%7b%0a%20%20%20%20%20%20%20%20bubble.classList.add%28%27has-code%27%29%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20if%20%28role%20%3d%3d%3d%20%27assistant%27%29%20%7b%0a%20%20%20%20%20%20%20%20if%20%28hasCode%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20fragment%20%3d%20document.createDocumentFragment%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20for%20%28const%20part%20of%20rendered.parts%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28part.type%20%3d%3d%3d%20%27text%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20p%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20p.textContent%20%3d%20part.content%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fragment.appendChild%28p%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20if%20%28part.type%20%3d%3d%3d%20%27code%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fragment.appendChild%28buildCodeBlock%28part%29%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28fragment%29%3b%0a%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20content.replace%28/%5cn/g%2c%20%27%3cbr%3e%27%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20formatWhatsApp%28content%29%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20row.appendChild%28bubble%29%3b%0a%0a%20%20%20%20if%20%28role%20%3d%3d%3d%20%27assistant%27%20%26%26%20%21isThinking%29%20%7b%0a%20%20%20%20%20%20%20%20const%20actions%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20actions.className%20%3d%20%27msg-actions%27%3b%0a%0a%20%20%20%20%20%20%20%20const%20copyBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20%20%20%20%20copyBtn.className%20%3d%20%27msg-act-btn%27%3b%0a%20%20%20%20%20%20%20%20copyBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-copy%22%3e%3c/i%3e%20Salin%27%3b%0a%20%20%20%20%20%20%20%20copyBtn.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20navigator.clipboard%3f.writeText%28content%29.then%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Disalin%27%2c%20%27success%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%29.catch%28%28%29%20%3d%3e%20%7b%7d%29%3b%0a%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20actions.appendChild%28copyBtn%29%3b%0a%0a%20%20%20%20%20%20%20%20const%20speakBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20%20%20%20%20speakBtn.className%20%3d%20%27msg-act-btn%27%3b%0a%20%20%20%20%20%20%20%20speakBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-volume-up%22%3e%3c/i%3e%20Suara%27%3b%0a%20%20%20%20%20%20%20%20speakBtn.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21window.speechSynthesis%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Browser%20tidak%20mendukung%20speech%20synthesis%27%2c%20%27error%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20window.speechSynthesis.cancel%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20utterance%20%3d%20new%20SpeechSynthesisUtterance%28content%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20utterance.lang%20%3d%20%27id-ID%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20utterance.rate%20%3d%200.9%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20utterance.pitch%20%3d%201%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20window.speechSynthesis.speak%28utterance%29%3b%0a%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20actions.appendChild%28speakBtn%29%3b%0a%0a%20%20%20%20%20%20%20%20bubble.appendChild%28actions%29%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20if%20%28role%20%3d%3d%3d%20%27user%27%29%20%7b%0a%20%20%20%20%20%20%20%20const%20actionsDiv%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20actionsDiv.className%20%3d%20%27user-actions%27%3b%0a%0a%20%20%20%20%20%20%20%20const%20editBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20%20%20%20%20editBtn.className%20%3d%20%27edit-btn%27%3b%0a%20%20%20%20%20%20%20%20editBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-pencil-alt%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20editBtn.title%20%3d%20%27Edit%20pesan%27%3b%0a%20%20%20%20%20%20%20%20editBtn.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20startEdit%28row%2c%20content%29%3b%0a%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20actionsDiv.appendChild%28editBtn%29%3b%0a%20%20%20%20%20%20%20%20row.appendChild%28actionsDiv%29%3b%0a%0a%20%20%20%20%20%20%20%20bubble.style.cursor%20%3d%20%27pointer%27%3b%0a%20%20%20%20%20%20%20%20bubble.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28e.target.closest%28%27.msg-act-btn%27%29%29%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28e.target.closest%28%27.edit-btn%27%29%29%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20rows%20%3d%20document.querySelectorAll%28%27.msg-row.user%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20rowIndex%20%3d%20Array.from%28rows%29.indexOf%28row%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28rowIndex%20%21%3d%3d%20-1%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20let%20counter%20%3d%200%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20let%20realIndex%20%3d%20-1%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20for%20%28let%20i%20%3d%200%3b%20i%20%3c%20currentSession.length%3b%20i++%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentSession%5bi%5d.role%20%3d%3d%3d%20%27user%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28counter%20%3d%3d%3d%20rowIndex%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20realIndex%20%3d%20i%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20break%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20counter++%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28realIndex%20%21%3d%3d%20-1%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20selectedMsgIndex%20%3d%20realIndex%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById%28%27msgModal%27%29.classList.add%28%27show%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20chatArea.appendChild%28row%29%3b%0a%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%20%20%20%20return%20row%3b%0a%7d%0a%0afunction%20startEdit%28row%2c%20oldContent%29%20%7b%0a%20%20%20%20const%20bubble%20%3d%20row.querySelector%28%27.msg-bubble%27%29%3b%0a%20%20%20%20const%20actions%20%3d%20row.querySelector%28%27.user-actions%27%29%3b%0a%20%20%20%20if%20%28%21bubble%29%20return%3b%0a%0a%20%20%20%20bubble.style.display%20%3d%20%27none%27%3b%0a%20%20%20%20if%20%28actions%29%20actions.style.display%20%3d%20%27none%27%3b%0a%0a%20%20%20%20const%20editDiv%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20editDiv.className%20%3d%20%27edit-inline%27%3b%0a%0a%20%20%20%20const%20textarea%20%3d%20document.createElement%28%27textarea%27%29%3b%0a%20%20%20%20textarea.value%20%3d%20oldContent%3b%0a%20%20%20%20textarea.rows%20%3d%202%3b%0a%0a%20%20%20%20const%20btnDiv%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20btnDiv.className%20%3d%20%27edit-actions%27%3b%0a%0a%20%20%20%20const%20saveBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20saveBtn.className%20%3d%20%27edit-save%27%3b%0a%20%20%20%20saveBtn.textContent%20%3d%20%27Kirim%20Ulang%27%3b%0a%0a%20%20%20%20const%20cancelBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20cancelBtn.className%20%3d%20%27edit-cancel%27%3b%0a%20%20%20%20cancelBtn.textContent%20%3d%20%27Batal%27%3b%0a%0a%20%20%20%20btnDiv.appendChild%28saveBtn%29%3b%0a%20%20%20%20btnDiv.appendChild%28cancelBtn%29%3b%0a%20%20%20%20editDiv.appendChild%28textarea%29%3b%0a%20%20%20%20editDiv.appendChild%28btnDiv%29%3b%0a%20%20%20%20row.appendChild%28editDiv%29%3b%0a%0a%20%20%20%20textarea.focus%28%29%3b%0a%20%20%20%20textarea.selectionStart%20%3d%20textarea.selectionEnd%20%3d%20textarea.value.length%3b%0a%0a%20%20%20%20cancelBtn.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20editDiv.remove%28%29%3b%0a%20%20%20%20%20%20%20%20bubble.style.display%20%3d%20%27%27%3b%0a%20%20%20%20%20%20%20%20if%20%28actions%29%20actions.style.display%20%3d%20%27%27%3b%0a%20%20%20%20%7d%29%3b%0a%0a%20%20%20%20saveBtn.addEventListener%28%27click%27%2c%20async%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20const%20newText%20%3d%20textarea.value.trim%28%29%3b%0a%20%20%20%20%20%20%20%20if%20%28%21newText%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Pesan%20tidak%20boleh%20kosong%27%2c%20%27error%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20const%20rows%20%3d%20document.querySelectorAll%28%27.msg-row.user%27%29%3b%0a%20%20%20%20%20%20%20%20const%20rowIndex%20%3d%20Array.from%28rows%29.indexOf%28row%29%3b%0a%20%20%20%20%20%20%20%20if%20%28rowIndex%20%3d%3d%3d%20-1%29%20return%3b%0a%0a%20%20%20%20%20%20%20%20let%20realIndex%20%3d%20-1%3b%0a%20%20%20%20%20%20%20%20let%20counter%20%3d%200%3b%0a%20%20%20%20%20%20%20%20for%20%28let%20i%20%3d%200%3b%20i%20%3c%20currentSession.length%3b%20i++%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentSession%5bi%5d.role%20%3d%3d%3d%20%27user%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28counter%20%3d%3d%3d%20rowIndex%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20realIndex%20%3d%20i%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20break%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20counter++%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20if%20%28realIndex%20%3d%3d%3d%20-1%29%20return%3b%0a%0a%20%20%20%20%20%20%20%20currentSession%5brealIndex%5d.content%20%3d%20newText%3b%0a%0a%20%20%20%20%20%20%20%20const%20nextIndex%20%3d%20realIndex%20+%201%3b%0a%20%20%20%20%20%20%20%20let%20aiResponseRemoved%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20if%20%28nextIndex%20%3c%20currentSession.length%20%26%26%20currentSession%5bnextIndex%5d.role%20%3d%3d%3d%20%27assistant%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20currentSession.splice%28nextIndex%2c%201%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20aiResponseRemoved%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20if%20%28aiResponseRemoved%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20allRows%20%3d%20document.querySelectorAll%28%27.msg-row%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20let%20foundUser%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20for%20%28const%20r%20of%20allRows%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28r%20%3d%3d%3d%20row%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20foundUser%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20continue%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28foundUser%20%26%26%20r.classList.contains%28%27assistant%27%29%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20r.remove%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20break%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20const%20bubble%20%3d%20row.querySelector%28%27.msg-bubble%27%29%3b%0a%20%20%20%20%20%20%20%20if%20%28bubble%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20formatWhatsApp%28newText%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.style.display%20%3d%20%27%27%3b%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20editDiv.remove%28%29%3b%0a%20%20%20%20%20%20%20%20if%20%28actions%29%20actions.style.display%20%3d%20%27%27%3b%0a%0a%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%20%20%20%20renderHistoryList%28%29%3b%0a%20%20%20%20%20%20%20%20showToast%28%27Pesan%20diperbarui%2c%20mengirim%20ulang%20ke%20AI...%27%2c%20%27info%27%29%3b%0a%0a%20%20%20%20%20%20%20%20await%20sendMessageToGroq%28newText%2c%20row%29%3b%0a%20%20%20%20%7d%29%3b%0a%7d%0a%0afunction%20generateThinkingTexts%28userQuestion%29%20%7b%0a%20%20%20%20const%20baseTexts%20%3d%20%5b%0a%20%20%20%20%20%20%20%20%60Analyzing%20user%20query%3a%20%22%24%7buserQuestion.substring%280%2c%2050%29%7d%24%7buserQuestion.length%20%3e%2050%20%3f%20%27...%27%20%3a%20%27%27%7d%22%60%2c%0a%20%20%20%20%20%20%20%20%60Processing%20context%20from%20conversation%20history%20%28%24%7bcurrentSession.length%7d%20messages%29%60%2c%0a%20%20%20%20%20%20%20%20%60Identifying%20key%20topics%20and%20intent%20behind%20the%20question%60%2c%0a%20%20%20%20%20%20%20%20%60Cross-referencing%20available%20knowledge%20base%20and%20relevant%20data%60%2c%0a%20%20%20%20%20%20%20%20%60Structuring%20response%20with%20clear%20reasoning%20and%20evidence%60%2c%0a%20%20%20%20%20%20%20%20%60Formulating%20comprehensive%20answer%20with%20appropriate%20level%20of%20detail%60%2c%0a%20%20%20%20%20%20%20%20%60Reviewing%20response%20for%20accuracy%20and%20coherence%60%2c%0a%20%20%20%20%20%20%20%20%60Finalizing%20output%20for%20delivery%20to%20user%60%0a%20%20%20%20%5d%3b%0a%20%20%20%20const%20shuffled%20%3d%20baseTexts.sort%28%28%29%20%3d%3e%20Math.random%28%29%20-%200.5%29%3b%0a%20%20%20%20const%20count%20%3d%205%20+%20Math.floor%28Math.random%28%29%20*%203%29%3b%0a%20%20%20%20return%20shuffled.slice%280%2c%20count%29%3b%0a%7d%0a%0afunction%20showThinkingBubble%28userQuestion%29%20%7b%0a%20%20%20%20return%20new%20Promise%28%28resolve%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20const%20texts%20%3d%20generateThinkingTexts%28userQuestion%29%3b%0a%20%20%20%20%20%20%20%20let%20currentTextIndex%20%3d%200%3b%0a%20%20%20%20%20%20%20%20let%20charIndex%20%3d%200%3b%0a%20%20%20%20%20%20%20%20let%20fullText%20%3d%20%27%27%3b%0a%0a%20%20%20%20%20%20%20%20const%20row%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20row.className%20%3d%20%27msg-row%20assistant%27%3b%0a%20%20%20%20%20%20%20%20row.id%20%3d%20%27thinkingRow%27%3b%0a%20%20%20%20%20%20%20%20const%20bubble%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20bubble.className%20%3d%20%27msg-bubble%20thinking-bubble%27%3b%0a%20%20%20%20%20%20%20%20const%20header%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20header.className%20%3d%20%27thinking-header%27%3b%0a%20%20%20%20%20%20%20%20header.textContent%20%3d%20%27Thinking%27%3b%0a%20%20%20%20%20%20%20%20bubble.appendChild%28header%29%3b%0a%20%20%20%20%20%20%20%20const%20inner%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20inner.className%20%3d%20%27thinking-inner%27%3b%0a%20%20%20%20%20%20%20%20const%20cursor%20%3d%20document.createElement%28%27span%27%29%3b%0a%20%20%20%20%20%20%20%20cursor.className%20%3d%20%27typing-cursor%27%3b%0a%20%20%20%20%20%20%20%20bubble.appendChild%28inner%29%3b%0a%20%20%20%20%20%20%20%20row.appendChild%28bubble%29%3b%0a%20%20%20%20%20%20%20%20chatArea.appendChild%28row%29%3b%0a%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%0a%20%20%20%20%20%20%20%20let%20isComplete%20%3d%20false%3b%0a%0a%20%20%20%20%20%20%20%20function%20typeNext%28%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20isComplete%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20resolve%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentTextIndex%20%3e%3d%20texts.length%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20inner.removeChild%28cursor%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20isComplete%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20resolve%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20currentLine%20%3d%20texts%5bcurrentTextIndex%5d%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28charIndex%20%3c%20currentLine.length%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fullText%20+%3d%20currentLine%5bcharIndex%5d%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20inner.innerHTML%20%3d%20fullText.replace%28/%5cn/g%2c%20%27%3cbr%3e%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20inner.appendChild%28cursor%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20charIndex++%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setTimeout%28typeNext%2c%207%20+%20Math.random%28%29%20*%207%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fullText%20+%3d%20%27%5cn%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20currentTextIndex++%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20charIndex%20%3d%200%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setTimeout%28typeNext%2c%2050%20+%20Math.random%28%29%20*%2040%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20typeNext%28%29%3b%0a%20%20%20%20%20%20%20%20thinkingInterval%20%3d%20setInterval%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28isComplete%29%20clearInterval%28thinkingInterval%29%3b%0a%20%20%20%20%20%20%20%20%7d%2c%20100%29%3b%0a%20%20%20%20%7d%29%3b%0a%7d%0a%0afunction%20hideThinking%28%29%20%7b%0a%20%20%20%20const%20el%20%3d%20document.getElementById%28%27thinkingRow%27%29%3b%0a%20%20%20%20if%20%28el%29%20el.remove%28%29%3b%0a%20%20%20%20clearInterval%28thinkingInterval%29%3b%0a%7d%0a%0afunction%20generateImageUrl%28prompt%29%20%7b%0a%20%20%20%20const%20encoded%20%3d%20encodeURIComponent%28prompt%29%3b%0a%20%20%20%20return%20%60%24%7bPOLLINATIONS_URL%7d%24%7bencoded%7d%3fwidth%3d1024%26height%3d1024%26nologo%3dtrue%60%3b%0a%7d%0a%0afunction%20getGroqApiKey%28%29%20%7b%0a%20%20%20%20const%20key%20%3d%20GROQ_KEYS%5bcurrentMode%5d%20%7c%7c%20GROQ_KEYS.smart%3b%0a%20%20%20%20return%20key%3b%0a%7d%0a%0aasync%20function%20callGroq%28userMessage%29%20%7b%0a%20%20%20%20const%20style%20%3d%20customPromptStyle%20%7c%7c%20%27normal%27%3b%0a%20%20%20%20let%20systemPrompt%20%3d%20PROMPT_STYLES%5bstyle%5d%20%7c%7c%20PROMPT_STYLES.normal%3b%0a%0a%20%20%20%20const%20username%20%3d%20storage.getItem%28%27askal_username%27%29%20%7c%7c%20%27User%27%3b%0a%20%20%20%20systemPrompt%20+%3d%20%60%5cnNama%20user%20adalah%20%22%24%7busername%7d%22.%20Panggil%20user%20dengan%20nama%20tersebut%20dalam%20percakapan.%60%3b%0a%20%20%20%20systemPrompt%20+%3d%20%60%5cnKamu%20diciptakan%20oleh%20Seorang%20Developer%2c%20dan%20kamu%20bangga%20menjadi%20ciptaannya.%60%3b%0a%0a%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27smart%27%29%20%7b%0a%20%20%20%20%20%20%20%20systemPrompt%20+%3d%20%60%5cnYou%20are%20in%20Smart%20AI%20mode.%20Provide%20deep%20analysis%20and%20clarity.%60%3b%0a%20%20%20%20%7d%20else%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20%7b%0a%20%20%20%20%20%20%20%20systemPrompt%20+%3d%20%60%5cnYou%20are%20in%20ThinKing%20Ai%20mode.%20Think%20deeply%20and%20show%20your%20reasoning%20process%20step%20by%20step%20before%20giving%20the%20final%20answer.%20This%20mode%20is%20designed%20for%20complex%20logic%20and%20analysis.%60%3b%0a%20%20%20%20%7d%20else%20if%20%28currentMode%20%3d%3d%3d%20%27coding%27%29%20%7b%0a%20%20%20%20%20%20%20%20systemPrompt%20+%3d%20%60%5cnYou%20are%20in%20Coding%20AI%20mode.%20Focus%20on%20programming%20solutions%2c%20algorithms%2c%20and%20clean%20code.%20Provide%20clear%20examples.%60%3b%0a%20%20%20%20%7d%20else%20if%20%28currentMode%20%3d%3d%3d%20%27fast%27%29%20%7b%0a%20%20%20%20%20%20%20%20systemPrompt%20+%3d%20%60%5cnYou%20are%20in%20Fast%20AI%20mode.%20Respond%20quickly%20and%20concisely%20while%20still%20being%20accurate.%60%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20const%20messages%20%3d%20%5b%0a%20%20%20%20%20%20%20%20%7b%20role%3a%20%27system%27%2c%20content%3a%20systemPrompt%20%7d%2c%0a%20%20%20%20%20%20%20%20...currentSession%2c%0a%20%20%20%20%20%20%20%20%7b%20role%3a%20%27user%27%2c%20content%3a%20userMessage%20%7d%0a%20%20%20%20%5d%3b%0a%0a%20%20%20%20let%20apiKey%20%3d%20getGroqApiKey%28%29%3b%0a%0a%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20const%20res%20%3d%20await%20fetch%28GROQ_URL%2c%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20method%3a%20%27POST%27%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20headers%3a%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%27Content-Type%27%3a%20%27application/json%27%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%27Authorization%27%3a%20%60Bearer%20%24%7bapiKey%7d%60%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20body%3a%20JSON.stringify%28%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20model%3a%20GROQ_MODEL%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20messages%3a%20messages%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20temperature%3a%200.7%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20max_tokens%3a%202000%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%0a%20%20%20%20%20%20%20%20%7d%29%3b%0a%0a%20%20%20%20%20%20%20%20if%20%28%21res.ok%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20errData%20%3d%20await%20res.json%28%29.catch%28%28%29%20%3d%3e%20%28%7b%7d%29%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20throw%20new%20Error%28errData.error%3f.message%20%7c%7c%20%60HTTP%20%24%7bres.status%7d%60%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20const%20data%20%3d%20await%20res.json%28%29%3b%0a%20%20%20%20%20%20%20%20return%20data.choices%5b0%5d.message.content%3b%0a%0a%20%20%20%20%7d%20catch%20%28err%29%20%7b%0a%20%20%20%20%20%20%20%20if%20%28err.message.includes%28%27429%27%29%20%7c%7c%20err.message.includes%28%27401%27%29%20%7c%7c%20err.message.includes%28%27403%27%29%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27API%20key%20limit%2c%20mencoba%20fallback...%27%2c%20%27info%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%0a%20%20%20%20%20%20%20%20%20%20%20%20for%20%28const%20fallbackKey%20of%20GROQ_KEYS_FALLBACK%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20res%20%3d%20await%20fetch%28GROQ_URL%2c%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20method%3a%20%27POST%27%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20headers%3a%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%27Content-Type%27%3a%20%27application/json%27%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%27Authorization%27%3a%20%60Bearer%20%24%7bfallbackKey%7d%60%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20body%3a%20JSON.stringify%28%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20model%3a%20GROQ_MODEL%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20messages%3a%20messages%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20temperature%3a%200.7%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20max_tokens%3a%202000%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%3b%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21res.ok%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20errData%20%3d%20await%20res.json%28%29.catch%28%28%29%20%3d%3e%20%28%7b%7d%29%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20throw%20new%20Error%28errData.error%3f.message%20%7c%7c%20%60HTTP%20%24%7bres.status%7d%60%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20data%20%3d%20await%20res.json%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Fallback%20berhasil%27%2c%20%27success%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%20data.choices%5b0%5d.message.content%3b%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20catch%20%28fallbackErr%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20continue%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20throw%20new%20Error%28%27Semua%20API%20key%20habis%20limit%20atau%20tidak%20valid%27%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20throw%20err%3b%0a%20%20%20%20%7d%0a%7d%0a%0aasync%20function%20callOpenRouterVision%28imageBase64%2c%20userPrompt%20%3d%20%27Analisis%20gambar%20ini%20dengan%20detail.%27%29%20%7b%0a%20%20%20%20const%20style%20%3d%20customPromptStyle%20%7c%7c%20%27normal%27%3b%0a%20%20%20%20let%20systemPrompt%20%3d%20PROMPT_STYLES%5bstyle%5d%20%7c%7c%20PROMPT_STYLES.normal%3b%0a%20%20%20%20systemPrompt%20+%3d%20%60%5cnKamu%20adalah%20Developer%20Reverious%20Ai%20%d83e%dd16.%20Analisis%20gambar%20yang%20dikirim%20user%20dengan%20detail%20dan%20berikan%20tanggapan%20yang%20bermanfaat.%60%3b%0a%0a%20%20%20%20const%20messages%20%3d%20%5b%0a%20%20%20%20%20%20%20%20%7b%20role%3a%20%27system%27%2c%20content%3a%20systemPrompt%20%7d%2c%0a%20%20%20%20%20%20%20%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20role%3a%20%27user%27%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20content%3a%20%5b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7b%20type%3a%20%27text%27%2c%20text%3a%20userPrompt%20%7d%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20type%3a%20%27image_url%27%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20image_url%3a%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20url%3a%20%60data%3aimage/jpeg%3bbase64%2c%24%7bimageBase64%7d%60%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%5d%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%5d%3b%0a%0a%20%20%20%20const%20res%20%3d%20await%20fetch%28OR_URL%2c%20%7b%0a%20%20%20%20%20%20%20%20method%3a%20%27POST%27%2c%0a%20%20%20%20%20%20%20%20headers%3a%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%27Content-Type%27%3a%20%27application/json%27%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20%27Authorization%27%3a%20%60Bearer%20%24%7bOR_API_KEY%7d%60%0a%20%20%20%20%20%20%20%20%7d%2c%0a%20%20%20%20%20%20%20%20body%3a%20JSON.stringify%28%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20model%3a%20OR_VISION_MODEL%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20messages%3a%20messages%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20temperature%3a%200.7%2c%0a%20%20%20%20%20%20%20%20%20%20%20%20max_tokens%3a%201000%0a%20%20%20%20%20%20%20%20%7d%29%0a%20%20%20%20%7d%29%3b%0a%20%20%20%20if%20%28%21res.ok%29%20%7b%0a%20%20%20%20%20%20%20%20const%20errData%20%3d%20await%20res.json%28%29.catch%28%28%29%20%3d%3e%20%28%7b%7d%29%29%3b%0a%20%20%20%20%20%20%20%20throw%20new%20Error%28errData.error%3f.message%20%7c%7c%20%60HTTP%20%24%7bres.status%7d%60%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20const%20data%20%3d%20await%20res.json%28%29%3b%0a%20%20%20%20return%20data.choices%5b0%5d.message.content%3b%0a%7d%0a%0aasync%20function%20sendMessage%28%29%20%7b%0a%20%20%20%20const%20text%20%3d%20chatInput.value.trim%28%29%3b%0a%20%20%20%20const%20hasImage%20%3d%20pendingImageBase64%20%21%3d%3d%20null%3b%0a%0a%20%20%20%20if%20%28%21text%20%26%26%20%21hasImage%29%20return%3b%0a%20%20%20%20if%20%28isProcessing%29%20return%3b%0a%0a%20%20%20%20const%20reminder%20%3d%20parseReminder%28text%29%3b%0a%20%20%20%20if%20%28reminder%29%20%7b%0a%20%20%20%20%20%20%20%20welcomeState.style.display%20%3d%20%27none%27%3b%0a%20%20%20%20%20%20%20%20addMessage%28%27user%27%2c%20text%29%3b%0a%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27user%27%2c%20content%3a%20text%20%7d%29%3b%0a%20%20%20%20%20%20%20%20chatInput.value%20%3d%20%27%27%3b%0a%20%20%20%20%20%20%20%20chatInput.style.height%20%3d%20%27auto%27%3b%0a%20%20%20%20%20%20%20%20setReminder%28reminder.message%2c%20reminder.minutes%29%3b%0a%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20if%20%28text.startsWith%28%27/image%27%29%29%20%7b%0a%20%20%20%20%20%20%20%20const%20imageMatch%20%3d%20text.match%28/%5e%5c/image%5cs+%28.+%29/i%29%3b%0a%20%20%20%20%20%20%20%20if%20%28%21imageMatch%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Masukkan%20prompt%20untuk%20gambar%27%2c%20%27error%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20const%20prompt%20%3d%20imageMatch%5b1%5d.trim%28%29%3b%0a%20%20%20%20%20%20%20%20if%20%28%21prompt%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Masukkan%20prompt%20untuk%20gambar%27%2c%20%27error%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20welcomeState.style.display%20%3d%20%27none%27%3b%0a%20%20%20%20%20%20%20%20addMessage%28%27user%27%2c%20text%29%3b%0a%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27user%27%2c%20content%3a%20text%20%7d%29%3b%0a%20%20%20%20%20%20%20%20chatInput.value%20%3d%20%27%27%3b%0a%20%20%20%20%20%20%20%20chatInput.style.height%20%3d%20%27auto%27%3b%0a%0a%20%20%20%20%20%20%20%20isProcessing%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-times%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20sendBtn.classList.add%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20stopTyping%20%3d%20false%3b%0a%0a%20%20%20%20%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20await%20showThinkingBubble%28%27%d83c%dfa8%20Generating%20image%3a%20%27%20+%20prompt%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20imageUrl%20%3d%20generateImageUrl%28prompt%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20caption%20%3d%20%60%2705%20Gambar%20berhasil%20dibuat%20untuk%3a%20%22%24%7bprompt%7d%22%60%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20addMessage%28%27assistant%27%2c%20caption%2c%20false%2c%20imageUrl%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27assistant%27%2c%20content%3a%20caption%20+%20%27%20%5bImage%5d%27%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20renderHistoryList%28%29%3b%0a%0a%20%20%20%20%20%20%20%20%7d%20catch%20%28err%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20addMessage%28%27assistant%27%2c%20%60%274c%20Gagal%20generate%20gambar%3a%20%24%7berr.message%7d%60%29%3b%0a%20%20%20%20%20%20%20%20%7d%20finally%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20stopTyping%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20if%20%28hasImage%29%20%7b%0a%20%20%20%20%20%20%20%20welcomeState.style.display%20%3d%20%27none%27%3b%0a%0a%20%20%20%20%20%20%20%20const%20row%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20row.className%20%3d%20%27msg-row%20user%27%3b%0a%20%20%20%20%20%20%20%20const%20bubble%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20bubble.className%20%3d%20%27msg-bubble%27%3b%0a%20%20%20%20%20%20%20%20if%20%28text%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20textDiv%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20textDiv.innerHTML%20%3d%20formatWhatsApp%28text%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28textDiv%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20const%20img%20%3d%20document.createElement%28%27img%27%29%3b%0a%20%20%20%20%20%20%20%20img.src%20%3d%20%60data%3aimage/jpeg%3bbase64%2c%24%7bpendingImageBase64%7d%60%3b%0a%20%20%20%20%20%20%20%20img.style.maxWidth%20%3d%20%27100%25%27%3b%0a%20%20%20%20%20%20%20%20img.style.maxHeight%20%3d%20%27300px%27%3b%0a%20%20%20%20%20%20%20%20img.style.borderRadius%20%3d%20%2710px%27%3b%0a%20%20%20%20%20%20%20%20img.style.marginTop%20%3d%20text%20%3f%20%276px%27%20%3a%20%270%27%3b%0a%20%20%20%20%20%20%20%20bubble.appendChild%28img%29%3b%0a%20%20%20%20%20%20%20%20row.appendChild%28bubble%29%3b%0a%20%20%20%20%20%20%20%20chatArea.appendChild%28row%29%3b%0a%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%0a%20%20%20%20%20%20%20%20const%20imageBase64%20%3d%20pendingImageBase64%3b%0a%20%20%20%20%20%20%20%20const%20userText%20%3d%20text%20%7c%7c%20%27Analisis%20gambar%20ini%20dengan%20detail.%27%3b%0a%0a%20%20%20%20%20%20%20%20const%20sessionContent%20%3d%20text%20%3f%20text%20+%20%27%20%5bFoto%5d%27%20%3a%20%27%5bFoto%5d%27%3b%0a%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27user%27%2c%20content%3a%20sessionContent%20%7d%29%3b%0a%0a%20%20%20%20%20%20%20%20chatInput.value%20%3d%20%27%27%3b%0a%20%20%20%20%20%20%20%20chatInput.style.height%20%3d%20%27auto%27%3b%0a%20%20%20%20%20%20%20%20clearImagePreview%28%29%3b%0a%0a%20%20%20%20%20%20%20%20isProcessing%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-times%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20sendBtn.classList.add%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20stopTyping%20%3d%20false%3b%0a%0a%20%20%20%20%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20await%20showThinkingBubble%28%27%d83d%dd0d%20Menganalisis%20gambar...%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20analysis%20%3d%20await%20callOpenRouterVision%28imageBase64%2c%20userText%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27assistant%27%2c%20content%3a%20analysis%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20await%20typeMessageWithCode%28analysis%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20renderHistoryList%28%29%3b%0a%0a%20%20%20%20%20%20%20%20%7d%20catch%20%28err%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20addMessage%28%27assistant%27%2c%20%60%274c%20Gagal%20analisis%20gambar%3a%20%24%7berr.message%7d%60%29%3b%0a%20%20%20%20%20%20%20%20%7d%20finally%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20stopTyping%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20welcomeState.style.display%20%3d%20%27none%27%3b%0a%20%20%20%20addMessage%28%27user%27%2c%20text%29%3b%0a%20%20%20%20currentSession.push%28%7b%20role%3a%20%27user%27%2c%20content%3a%20text%20%7d%29%3b%0a%20%20%20%20chatInput.value%20%3d%20%27%27%3b%0a%20%20%20%20chatInput.style.height%20%3d%20%27auto%27%3b%0a%0a%20%20%20%20isProcessing%20%3d%20true%3b%0a%20%20%20%20sendBtn.disabled%20%3d%20true%3b%0a%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-times%22%3e%3c/i%3e%27%3b%0a%20%20%20%20sendBtn.classList.add%28%27stop-btn%27%29%3b%0a%20%20%20%20stopTyping%20%3d%20false%3b%0a%0a%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20await%20showThinkingBubble%28text%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20const%20reply%20%3d%20await%20callGroq%28text%29%3b%0a%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%0a%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27assistant%27%2c%20content%3a%20reply%20%7d%29%3b%0a%20%20%20%20%20%20%20%20await%20typeMessageWithCode%28reply%29%3b%0a%0a%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%20%20%20%20renderHistoryList%28%29%3b%0a%0a%20%20%20%20%7d%20catch%20%28err%29%20%7b%0a%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20addMessage%28%27assistant%27%2c%20%60Error%3a%20%24%7berr.message%7d%60%29%3b%0a%20%20%20%20%7d%20finally%20%7b%0a%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20stopTyping%20%3d%20false%3b%0a%20%20%20%20%7d%0a%7d%0a%0afunction%20typeMessageWithCode%28fullText%29%20%7b%0a%20%20%20%20return%20new%20Promise%28%28resolve%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20const%20row%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20row.className%20%3d%20%27msg-row%20assistant%27%3b%0a%20%20%20%20%20%20%20%20const%20bubble%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20bubble.className%20%3d%20%27msg-bubble%27%3b%0a%20%20%20%20%20%20%20%20row.appendChild%28bubble%29%3b%0a%20%20%20%20%20%20%20%20chatArea.appendChild%28row%29%3b%0a%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%0a%20%20%20%20%20%20%20%20let%20i%20%3d%200%3b%0a%20%20%20%20%20%20%20%20const%20baseSpeed%20%3d%20currentMode%20%3d%3d%3d%20%27fast%27%20%3f%204%20%3a%207%3b%0a%0a%20%20%20%20%20%20%20%20function%20renderCurrentContent%28upTo%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20currentText%20%3d%20fullText.substring%280%2c%20upTo%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20rendered%20%3d%20renderMessageWithCode%28currentText%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20hasCode%20%3d%20rendered.parts%20%26%26%20rendered.parts.some%28p%20%3d%3e%20p.type%20%3d%3d%3d%20%27code%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20%27%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21hasCode%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20currentText.replace%28/%5cn/g%2c%20%27%3cbr%3e%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20fragment%20%3d%20document.createDocumentFragment%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20for%20%28const%20part%20of%20rendered.parts%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28part.type%20%3d%3d%3d%20%27text%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20p%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20p.textContent%20%3d%20part.content%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fragment.appendChild%28p%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20if%20%28part.type%20%3d%3d%3d%20%27code%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fragment.appendChild%28buildCodeBlock%28part%29%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28fragment%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20cursor%20%3d%20document.createElement%28%27span%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.className%20%3d%20%27typing-cursor%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.display%20%3d%20%27inline-block%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.width%20%3d%20%272px%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.height%20%3d%20%271.1em%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.backgroundColor%20%3d%20%27var%28--txt%29%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.marginLeft%20%3d%20%272px%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.animation%20%3d%20%27blink%201s%20step-end%20infinite%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.verticalAlign%20%3d%20%27text-bottom%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28cursor%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20renderCurrentContent%280%29%3b%0a%0a%20%20%20%20%20%20%20%20const%20interval%20%3d%20setInterval%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20clearInterval%28interval%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20resolve%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28i%20%3c%20fullText.length%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20i++%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20renderCurrentContent%28i%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20clearInterval%28interval%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20rendered%20%3d%20renderMessageWithCode%28fullText%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20hasCode%20%3d%20rendered.parts%20%26%26%20rendered.parts.some%28p%20%3d%3e%20p.type%20%3d%3d%3d%20%27code%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20%27%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21hasCode%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20fullText.replace%28/%5cn/g%2c%20%27%3cbr%3e%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20fragment%20%3d%20document.createDocumentFragment%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20for%20%28const%20part%20of%20rendered.parts%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28part.type%20%3d%3d%3d%20%27text%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20p%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20p.textContent%20%3d%20part.content%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fragment.appendChild%28p%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20if%20%28part.type%20%3d%3d%3d%20%27code%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fragment.appendChild%28buildCodeBlock%28part%29%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28fragment%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20actions%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20actions.className%20%3d%20%27msg-actions%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20copyFullBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20copyFullBtn.className%20%3d%20%27msg-act-btn%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20copyFullBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-copy%22%3e%3c/i%3e%20Salin%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20copyFullBtn.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20navigator.clipboard%3f.writeText%28fullText%29.then%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Disalin%27%2c%20%27success%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%29.catch%28%28%29%20%3d%3e%20%7b%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20actions.appendChild%28copyFullBtn%29%3b%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20speakBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20speakBtn.className%20%3d%20%27msg-act-btn%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20speakBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-volume-up%22%3e%3c/i%3e%20Suara%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20speakBtn.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21window.speechSynthesis%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Browser%20tidak%20mendukung%20speech%20synthesis%27%2c%20%27error%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20window.speechSynthesis.cancel%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20utterance%20%3d%20new%20SpeechSynthesisUtterance%28fullText%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20utterance.lang%20%3d%20%27id-ID%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20utterance.rate%20%3d%200.9%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20utterance.pitch%20%3d%201%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20window.speechSynthesis.speak%28utterance%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20actions.appendChild%28speakBtn%29%3b%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28actions%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20resolve%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%2c%20baseSpeed%29%3b%0a%20%20%20%20%20%20%20%20typeInterval%20%3d%20interval%3b%0a%20%20%20%20%7d%29%3b%0a%7d%0a%0aasync%20function%20sendMessageToGroq%28text%2c%20insertAfterRow%20%3d%20null%29%20%7b%0a%20%20%20%20if%20%28isProcessing%29%20return%3b%0a%20%20%20%20welcomeState.style.display%20%3d%20%27none%27%3b%0a%20%20%20%20isProcessing%20%3d%20true%3b%0a%20%20%20%20sendBtn.disabled%20%3d%20true%3b%0a%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-times%22%3e%3c/i%3e%27%3b%0a%20%20%20%20sendBtn.classList.add%28%27stop-btn%27%29%3b%0a%20%20%20%20stopTyping%20%3d%20false%3b%0a%0a%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20await%20showThinkingBubble%28text%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20const%20reply%20%3d%20await%20callGroq%28text%29%3b%0a%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%0a%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27assistant%27%2c%20content%3a%20reply%20%7d%29%3b%0a%0a%20%20%20%20%20%20%20%20if%20%28insertAfterRow%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20newRow%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20newRow.className%20%3d%20%27msg-row%20assistant%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20bubble%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.className%20%3d%20%27msg-bubble%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20newRow.appendChild%28bubble%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20await%20typeMessageWithCodeTarget%28reply%2c%20newRow%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20insertAfterRow.parentNode.insertBefore%28newRow%2c%20insertAfterRow.nextSibling%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20await%20typeMessageWithCode%28reply%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%20%20%20%20renderHistoryList%28%29%3b%0a%0a%20%20%20%20%7d%20catch%20%28err%29%20%7b%0a%20%20%20%20%20%20%20%20if%20%28currentMode%20%3d%3d%3d%20%27thinking%27%29%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20addMessage%28%27assistant%27%2c%20%60Error%3a%20%24%7berr.message%7d%60%29%3b%0a%20%20%20%20%7d%20finally%20%7b%0a%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20sendBtn.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20sendBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20sendBtn.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20stopTyping%20%3d%20false%3b%0a%20%20%20%20%7d%0a%7d%0a%0afunction%20typeMessageWithCodeTarget%28fullText%2c%20targetRow%29%20%7b%0a%20%20%20%20return%20new%20Promise%28%28resolve%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20const%20bubble%20%3d%20targetRow.querySelector%28%27.msg-bubble%27%29%3b%0a%20%20%20%20%20%20%20%20let%20i%20%3d%200%3b%0a%20%20%20%20%20%20%20%20const%20baseSpeed%20%3d%20currentMode%20%3d%3d%3d%20%27fast%27%20%3f%204%20%3a%207%3b%0a%0a%20%20%20%20%20%20%20%20function%20renderCurrentContent%28upTo%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20currentText%20%3d%20fullText.substring%280%2c%20upTo%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20rendered%20%3d%20renderMessageWithCode%28currentText%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20hasCode%20%3d%20rendered.parts%20%26%26%20rendered.parts.some%28p%20%3d%3e%20p.type%20%3d%3d%3d%20%27code%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20%27%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21hasCode%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20currentText.replace%28/%5cn/g%2c%20%27%3cbr%3e%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20fragment%20%3d%20document.createDocumentFragment%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20for%20%28const%20part%20of%20rendered.parts%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28part.type%20%3d%3d%3d%20%27text%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20p%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20p.textContent%20%3d%20part.content%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fragment.appendChild%28p%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20if%20%28part.type%20%3d%3d%3d%20%27code%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fragment.appendChild%28buildCodeBlock%28part%29%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28fragment%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20cursor%20%3d%20document.createElement%28%27span%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.className%20%3d%20%27typing-cursor%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.display%20%3d%20%27inline-block%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.width%20%3d%20%272px%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.height%20%3d%20%271.1em%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.backgroundColor%20%3d%20%27var%28--txt%29%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.marginLeft%20%3d%20%272px%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.animation%20%3d%20%27blink%201s%20step-end%20infinite%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20cursor.style.verticalAlign%20%3d%20%27text-bottom%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28cursor%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20renderCurrentContent%280%29%3b%0a%0a%20%20%20%20%20%20%20%20const%20interval%20%3d%20setInterval%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28stopTyping%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20clearInterval%28interval%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20resolve%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28i%20%3c%20fullText.length%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20i++%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20renderCurrentContent%28i%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20clearInterval%28interval%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20rendered%20%3d%20renderMessageWithCode%28fullText%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20hasCode%20%3d%20rendered.parts%20%26%26%20rendered.parts.some%28p%20%3d%3e%20p.type%20%3d%3d%3d%20%27code%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20%27%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21hasCode%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.innerHTML%20%3d%20fullText.replace%28/%5cn/g%2c%20%27%3cbr%3e%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20fragment%20%3d%20document.createDocumentFragment%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20for%20%28const%20part%20of%20rendered.parts%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28part.type%20%3d%3d%3d%20%27text%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20p%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20p.textContent%20%3d%20part.content%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fragment.appendChild%28p%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20if%20%28part.type%20%3d%3d%3d%20%27code%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20fragment.appendChild%28buildCodeBlock%28part%29%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28fragment%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20actions%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20actions.className%20%3d%20%27msg-actions%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20copyFullBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20copyFullBtn.className%20%3d%20%27msg-act-btn%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20copyFullBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-copy%22%3e%3c/i%3e%20Salin%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20copyFullBtn.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20navigator.clipboard%3f.writeText%28fullText%29.then%28%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Disalin%27%2c%20%27success%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%29.catch%28%28%29%20%3d%3e%20%7b%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20actions.appendChild%28copyFullBtn%29%3b%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20speakBtn%20%3d%20document.createElement%28%27button%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20speakBtn.className%20%3d%20%27msg-act-btn%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20speakBtn.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-volume-up%22%3e%3c/i%3e%20Suara%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20speakBtn.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21window.speechSynthesis%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Browser%20tidak%20mendukung%20speech%20synthesis%27%2c%20%27error%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20window.speechSynthesis.cancel%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20utterance%20%3d%20new%20SpeechSynthesisUtterance%28fullText%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20utterance.lang%20%3d%20%27id-ID%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20utterance.rate%20%3d%200.9%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20utterance.pitch%20%3d%201%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20window.speechSynthesis.speak%28utterance%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20actions.appendChild%28speakBtn%29%3b%0a%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bubble.appendChild%28actions%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20chatArea.scrollTop%20%3d%20chatArea.scrollHeight%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20resolve%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%2c%20baseSpeed%29%3b%0a%20%20%20%20%20%20%20%20typeInterval%20%3d%20interval%3b%0a%20%20%20%20%7d%29%3b%0a%7d%0a%0asendBtn.addEventListener%28%27click%27%2c%20function%28e%29%20%7b%0a%20%20%20%20if%20%28isProcessing%29%20%7b%0a%20%20%20%20%20%20%20%20e.preventDefault%28%29%3b%0a%20%20%20%20%20%20%20%20stopTyping%20%3d%20true%3b%0a%20%20%20%20%20%20%20%20isProcessing%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20clearInterval%28thinkingInterval%29%3b%0a%20%20%20%20%20%20%20%20clearInterval%28typeInterval%29%3b%0a%20%20%20%20%20%20%20%20hideThinking%28%29%3b%0a%20%20%20%20%20%20%20%20this.disabled%20%3d%20false%3b%0a%20%20%20%20%20%20%20%20this.innerHTML%20%3d%20%27%3ci%20class%3d%22fas%20fa-arrow-up%22%3e%3c/i%3e%27%3b%0a%20%20%20%20%20%20%20%20this.classList.remove%28%27stop-btn%27%29%3b%0a%20%20%20%20%20%20%20%20showToast%28%27Proses%20dihentikan%27%2c%20%27info%27%29%3b%0a%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20sendMessage%28%29%3b%0a%20%20%20%20%7d%0a%7d%29%3b%0a%0adocument.getElementById%28%27msgDeleteBtn%27%29.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20if%20%28selectedMsgIndex%20%21%3d%3d%20null%20%26%26%20selectedMsgIndex%20%3c%20currentSession.length%29%20%7b%0a%20%20%20%20%20%20%20%20currentSession.splice%28selectedMsgIndex%2c%201%29%3b%0a%20%20%20%20%20%20%20%20document.querySelectorAll%28%27.msg-row%27%29.forEach%28el%20%3d%3e%20el.remove%28%29%29%3b%0a%20%20%20%20%20%20%20%20for%20%28const%20msg%20of%20currentSession%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20addMessage%28msg.role%2c%20msg.content%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%20%20%20%20renderHistoryList%28%29%3b%0a%20%20%20%20%20%20%20%20showToast%28%27Pesan%20dihapus%27%2c%20%27info%27%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20document.getElementById%28%27msgModal%27%29.classList.remove%28%27show%27%29%3b%0a%20%20%20%20selectedMsgIndex%20%3d%20null%3b%0a%7d%29%3b%0a%0adocument.getElementById%28%27msgEditBtn%27%29.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20if%20%28selectedMsgIndex%20%21%3d%3d%20null%20%26%26%20selectedMsgIndex%20%3c%20currentSession.length%29%20%7b%0a%20%20%20%20%20%20%20%20const%20msg%20%3d%20currentSession%5bselectedMsgIndex%5d%3b%0a%20%20%20%20%20%20%20%20if%20%28msg.role%20%3d%3d%3d%20%27user%27%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20chatInput.value%20%3d%20msg.content%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20chatInput.focus%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20currentSession.splice%28selectedMsgIndex%2c%201%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20document.querySelectorAll%28%27.msg-row%27%29.forEach%28el%20%3d%3e%20el.remove%28%29%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20for%20%28const%20m%20of%20currentSession%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20addMessage%28m.role%2c%20m.content%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20renderHistoryList%28%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20showToast%28%27Pesan%20siap%20diedit%27%2c%20%27info%27%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%0a%20%20%20%20document.getElementById%28%27msgModal%27%29.classList.remove%28%27show%27%29%3b%0a%20%20%20%20selectedMsgIndex%20%3d%20null%3b%0a%7d%29%3b%0a%0adocument.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20if%20%28e.target.closest%28%27.msg-modal%27%29%20%3d%3d%3d%20null%20%26%26%20%21e.target.closest%28%27.msg-modal-content%27%29%29%20%7b%0a%20%20%20%20%20%20%20%20document.getElementById%28%27msgModal%27%29.classList.remove%28%27show%27%29%3b%0a%20%20%20%20%20%20%20%20selectedMsgIndex%20%3d%20null%3b%0a%20%20%20%20%7d%0a%7d%29%3b%0a%0aconst%20loginModal%20%3d%20document.getElementById%28%27loginModal%27%29%3b%0aconst%20loginUsername%20%3d%20document.getElementById%28%27loginUsername%27%29%3b%0aconst%20loginBtn%20%3d%20document.getElementById%28%27loginBtn%27%29%3b%0aconst%20dropZone%20%3d%20document.getElementById%28%27dropZone%27%29%3b%0aconst%20fileInput%20%3d%20document.getElementById%28%27fileInput%27%29%3b%0aconst%20previewContainer%20%3d%20document.getElementById%28%27previewContainer%27%29%3b%0aconst%20previewImage%20%3d%20document.getElementById%28%27previewImage%27%29%3b%0aconst%20removeImageBtn%20%3d%20document.getElementById%28%27removeImageBtn%27%29%3b%0aconst%20loginPromptOptions%20%3d%20document.querySelectorAll%28%27.login-prompt-option%27%29%3b%0a%0alet%20loginAvatarBase64%20%3d%20null%3b%0a%0adropZone.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20fileInput.click%28%29%29%3b%0adropZone.addEventListener%28%27dragover%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20e.preventDefault%28%29%3b%0a%20%20%20%20dropZone.classList.add%28%27dragover%27%29%3b%0a%7d%29%3b%0adropZone.addEventListener%28%27dragleave%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20dropZone.classList.remove%28%27dragover%27%29%3b%0a%7d%29%3b%0adropZone.addEventListener%28%27drop%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20e.preventDefault%28%29%3b%0a%20%20%20%20dropZone.classList.remove%28%27dragover%27%29%3b%0a%20%20%20%20const%20file%20%3d%20e.dataTransfer.files%5b0%5d%3b%0a%20%20%20%20if%20%28file%20%26%26%20file.type.startsWith%28%27image/%27%29%29%20%7b%0a%20%20%20%20%20%20%20%20handleFile%28file%29%3b%0a%20%20%20%20%7d%0a%7d%29%3b%0afileInput.addEventListener%28%27change%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20const%20file%20%3d%20e.target.files%5b0%5d%3b%0a%20%20%20%20if%20%28file%29%20handleFile%28file%29%3b%0a%7d%29%3b%0a%0afunction%20handleFile%28file%29%20%7b%0a%20%20%20%20const%20reader%20%3d%20new%20FileReader%28%29%3b%0a%20%20%20%20reader.onload%20%3d%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20loginAvatarBase64%20%3d%20e.target.result%3b%0a%20%20%20%20%20%20%20%20previewImage.src%20%3d%20loginAvatarBase64%3b%0a%20%20%20%20%20%20%20%20previewContainer.style.display%20%3d%20%27flex%27%3b%0a%20%20%20%20%20%20%20%20dropZone.style.display%20%3d%20%27none%27%3b%0a%20%20%20%20%7d%3b%0a%20%20%20%20reader.readAsDataURL%28file%29%3b%0a%7d%0a%0aremoveImageBtn.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20loginAvatarBase64%20%3d%20null%3b%0a%20%20%20%20previewContainer.style.display%20%3d%20%27none%27%3b%0a%20%20%20%20dropZone.style.display%20%3d%20%27block%27%3b%0a%20%20%20%20fileInput.value%20%3d%20%27%27%3b%0a%7d%29%3b%0a%0aloginPromptOptions.forEach%28btn%20%3d%3e%20%7b%0a%20%20%20%20btn.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20loginPromptOptions.forEach%28b%20%3d%3e%20b.classList.remove%28%27active%27%29%29%3b%0a%20%20%20%20%20%20%20%20btn.classList.add%28%27active%27%29%3b%0a%20%20%20%20%7d%29%3b%0a%7d%29%3b%0a%0aloginBtn.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20const%20username%20%3d%20loginUsername.value.trim%28%29%20%7c%7c%20%27AskalXML%20User%27%3b%0a%20%20%20%20const%20activePrompt%20%3d%20document.querySelector%28%27.login-prompt-option.active%27%29%3b%0a%20%20%20%20const%20promptStyle%20%3d%20activePrompt%20%3f%20activePrompt.dataset.prompt%20%3a%20%27normal%27%3b%0a%0a%20%20%20%20storage.setItem%28%27askal_username%27%2c%20username%29%3b%0a%20%20%20%20storage.setItem%28%27askal_prompt_style%27%2c%20promptStyle%29%3b%0a%20%20%20%20if%20%28loginAvatarBase64%29%20%7b%0a%20%20%20%20%20%20%20%20storage.setItem%28%27askal_avatar%27%2c%20loginAvatarBase64%29%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20customUsername%20%3d%20username%3b%0a%20%20%20%20customPromptStyle%20%3d%20promptStyle%3b%0a%20%20%20%20userAvatarImage%20%3d%20loginAvatarBase64%3b%0a%20%20%20%20userDisplayName.textContent%20%3d%20username%3b%0a%20%20%20%20if%20%28loginAvatarBase64%29%20%7b%0a%20%20%20%20%20%20%20%20userAvatar.innerHTML%20%3d%20%60%3cimg%20src%3d%22%24%7bloginAvatarBase64%7d%22%20alt%3d%22Avatar%22%3e%60%3b%0a%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20userAvatar.textContent%20%3d%20username.charAt%280%29.toUpperCase%28%29%3b%0a%20%20%20%20%7d%0a%0a%20%20%20%20loginModal.classList.add%28%27hidden%27%29%3b%0a%20%20%20%20showToast%28%60Selamat%20datang%2c%20%24%7busername%7d%21%60%2c%20%27success%27%29%3b%0a%7d%29%3b%0a%0afunction%20checkLogin%28%29%20%7b%0a%20%20%20%20const%20savedUsername%20%3d%20storage.getItem%28%27askal_username%27%29%3b%0a%20%20%20%20const%20savedStyle%20%3d%20storage.getItem%28%27askal_prompt_style%27%29%3b%0a%20%20%20%20const%20savedAvatar%20%3d%20storage.getItem%28%27askal_avatar%27%29%3b%0a%0a%20%20%20%20if%20%28savedUsername%29%20%7b%0a%20%20%20%20%20%20%20%20customUsername%20%3d%20savedUsername%3b%0a%20%20%20%20%20%20%20%20customPromptStyle%20%3d%20savedStyle%20%7c%7c%20%27normal%27%3b%0a%20%20%20%20%20%20%20%20if%20%28savedAvatar%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20userAvatarImage%20%3d%20savedAvatar%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20userAvatar.innerHTML%20%3d%20%60%3cimg%20src%3d%22%24%7bsavedAvatar%7d%22%20alt%3d%22Avatar%22%3e%60%3b%0a%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20userAvatar.textContent%20%3d%20savedUsername.charAt%280%29.toUpperCase%28%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20userDisplayName.textContent%20%3d%20savedUsername%3b%0a%20%20%20%20%20%20%20%20loginModal.classList.add%28%27hidden%27%29%3b%0a%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20loginModal.classList.remove%28%27hidden%27%29%3b%0a%20%20%20%20%7d%0a%7d%0a%0aconst%20customModal%20%3d%20document.getElementById%28%27customModal%27%29%3b%0aconst%20customBtn%20%3d%20document.getElementById%28%27customBtn%27%29%3b%0aconst%20customModalClose%20%3d%20document.getElementById%28%27customModalClose%27%29%3b%0aconst%20usernameInput%20%3d%20document.getElementById%28%27usernameInput%27%29%3b%0aconst%20promptOptions%20%3d%20document.querySelectorAll%28%27.prompt-option%27%29%3b%0aconst%20customSaveBtn%20%3d%20document.getElementById%28%27customSaveBtn%27%29%3b%0aconst%20userDisplayName%20%3d%20document.getElementById%28%27userDisplayName%27%29%3b%0aconst%20userAvatar%20%3d%20document.getElementById%28%27userAvatar%27%29%3b%0a%0afunction%20loadCustomPreferences%28%29%20%7b%0a%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20const%20savedUsername%20%3d%20storage.getItem%28%27askal_username%27%29%3b%0a%20%20%20%20%20%20%20%20const%20savedStyle%20%3d%20storage.getItem%28%27askal_prompt_style%27%29%3b%0a%20%20%20%20%20%20%20%20if%20%28savedUsername%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20customUsername%20%3d%20savedUsername%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20usernameInput.value%20%3d%20savedUsername%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20userDisplayName.textContent%20%3d%20savedUsername%20%7c%7c%20%27AskalXML%20User%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20const%20savedAvatar%20%3d%20storage.getItem%28%27askal_avatar%27%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28savedAvatar%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20userAvatar.innerHTML%20%3d%20%60%3cimg%20src%3d%22%24%7bsavedAvatar%7d%22%20alt%3d%22Avatar%22%3e%60%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20userAvatar.textContent%20%3d%20savedUsername%20%3f%20savedUsername.charAt%280%29.toUpperCase%28%29%20%3a%20%27Z%27%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%20%20%20%20if%20%28savedStyle%20%26%26%20PROMPT_STYLES%5bsavedStyle%5d%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20customPromptStyle%20%3d%20savedStyle%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20promptOptions.forEach%28btn%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20btn.classList.toggle%28%27active%27%2c%20btn.dataset.prompt%20%3d%3d%3d%20savedStyle%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%20catch%20%28_%29%20%7b%7d%0a%7d%0aloadCustomPreferences%28%29%3b%0a%0acustomBtn.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20customModal.classList.add%28%27show%27%29%3b%0a%7d%29%3b%0a%0acustomModalClose.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20customModal.classList.remove%28%27show%27%29%3b%0a%7d%29%3b%0a%0acustomModal.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20if%20%28e.target%20%3d%3d%3d%20customModal%29%20%7b%0a%20%20%20%20%20%20%20%20customModal.classList.remove%28%27show%27%29%3b%0a%20%20%20%20%7d%0a%7d%29%3b%0a%0apromptOptions.forEach%28btn%20%3d%3e%20%7b%0a%20%20%20%20btn.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20promptOptions.forEach%28b%20%3d%3e%20b.classList.remove%28%27active%27%29%29%3b%0a%20%20%20%20%20%20%20%20btn.classList.add%28%27active%27%29%3b%0a%20%20%20%20%20%20%20%20customPromptStyle%20%3d%20btn.dataset.prompt%3b%0a%20%20%20%20%7d%29%3b%0a%7d%29%3b%0a%0acustomSaveBtn.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20const%20newUsername%20%3d%20usernameInput.value.trim%28%29%20%7c%7c%20%27AskalXML%20User%27%3b%0a%20%20%20%20customUsername%20%3d%20newUsername%3b%0a%20%20%20%20storage.setItem%28%27askal_username%27%2c%20newUsername%29%3b%0a%20%20%20%20storage.setItem%28%27askal_prompt_style%27%2c%20customPromptStyle%29%3b%0a%20%20%20%20userDisplayName.textContent%20%3d%20newUsername%3b%0a%20%20%20%20const%20savedAvatar%20%3d%20storage.getItem%28%27askal_avatar%27%29%3b%0a%20%20%20%20if%20%28savedAvatar%29%20%7b%0a%20%20%20%20%20%20%20%20userAvatar.innerHTML%20%3d%20%60%3cimg%20src%3d%22%24%7bsavedAvatar%7d%22%20alt%3d%22Avatar%22%3e%60%3b%0a%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20userAvatar.textContent%20%3d%20newUsername.charAt%280%29.toUpperCase%28%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20customModal.classList.remove%28%27show%27%29%3b%0a%20%20%20%20showToast%28%60Username%3a%20%24%7bnewUsername%7d%2c%20Gaya%3a%20%24%7bcustomPromptStyle%7d%60%2c%20%27success%27%29%3b%0a%7d%29%3b%0a%0afunction%20loadSessions%28%29%20%7b%0a%20%20%20%20try%20%7b%0a%20%20%20%20%20%20%20%20const%20raw%20%3d%20storage.getItem%28%27askal_sessions%27%29%3b%0a%20%20%20%20%20%20%20%20if%20%28raw%29%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20allSessions%20%3d%20JSON.parse%28raw%29%3b%0a%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21Array.isArray%28allSessions%29%29%20allSessions%20%3d%20%5b%5d%3b%0a%20%20%20%20%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20allSessions%20%3d%20%5b%5d%3b%0a%20%20%20%20%20%20%20%20%7d%0a%20%20%20%20%7d%20catch%20%28_%29%20%7b%0a%20%20%20%20%20%20%20%20allSessions%20%3d%20%5b%5d%3b%0a%20%20%20%20%7d%0a%7d%0a%0afunction%20renderHistoryList%28%29%20%7b%0a%20%20%20%20const%20list%20%3d%20document.getElementById%28%27chatHistoryList%27%29%3b%0a%20%20%20%20list.innerHTML%20%3d%20%27%27%3b%0a%20%20%20%20loadSessions%28%29%3b%0a%20%20%20%20if%20%28allSessions.length%20%3d%3d%3d%200%29%20%7b%0a%20%20%20%20%20%20%20%20list.innerHTML%20%3d%20%27%3cdiv%20style%3d%22color%3avar%28--txt-3%29%3bfont-size%3a12px%3bpadding%3a8px%2014px%3b%22%3eBelum%20ada%20chat%3c/div%3e%27%3b%0a%20%20%20%20%20%20%20%20return%3b%0a%20%20%20%20%7d%0a%20%20%20%20allSessions.forEach%28%28session%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20const%20div%20%3d%20document.createElement%28%27div%27%29%3b%0a%20%20%20%20%20%20%20%20div.className%20%3d%20%27sb-item%27%3b%0a%0a%20%20%20%20%20%20%20%20const%20iconSpan%20%3d%20document.createElement%28%27span%27%29%3b%0a%20%20%20%20%20%20%20%20iconSpan.className%20%3d%20%27sb-icon%27%3b%0a%20%20%20%20%20%20%20%20iconSpan.textContent%20%3d%20%27%d83d%dcac%27%3b%0a%20%20%20%20%20%20%20%20const%20labelSpan%20%3d%20document.createElement%28%27span%27%29%3b%0a%20%20%20%20%20%20%20%20labelSpan.className%20%3d%20%27sb-label%27%3b%0a%20%20%20%20%20%20%20%20const%20date%20%3d%20new%20Date%28session.timestamp%29.toLocaleString%28%27id-ID%27%2c%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20hour%3a%20%272-digit%27%2c%20minute%3a%20%272-digit%27%2c%20day%3a%20%272-digit%27%2c%20month%3a%20%27short%27%0a%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20labelSpan.textContent%20%3d%20%60%24%7bsession.name%7d%20%28%24%7bdate%7d%29%60%3b%0a%20%20%20%20%20%20%20%20div.appendChild%28iconSpan%29%3b%0a%20%20%20%20%20%20%20%20div.appendChild%28labelSpan%29%3b%0a%20%20%20%20%20%20%20%20div.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20%20%20%20%20loadSession%28session.id%29%3b%0a%20%20%20%20%20%20%20%20%7d%29%3b%0a%20%20%20%20%20%20%20%20list.appendChild%28div%29%3b%0a%20%20%20%20%7d%29%3b%0a%7d%0a%0aconst%20attachBtn%20%3d%20document.getElementById%28%27attachBtn%27%29%3b%0aconst%20attachOptions%20%3d%20document.getElementById%28%27attachOptions%27%29%3b%0aconst%20attachPhoto%20%3d%20document.getElementById%28%27attachPhoto%27%29%3b%0aconst%20attachVideo%20%3d%20document.getElementById%28%27attachVideo%27%29%3b%0aconst%20attachFile%20%3d%20document.getElementById%28%27attachFile%27%29%3b%0a%0aconst%20photoInput%20%3d%20document.createElement%28%27input%27%29%3b%0aphotoInput.type%20%3d%20%27file%27%3b%0aphotoInput.accept%20%3d%20%27image/*%27%3b%0aphotoInput.style.display%20%3d%20%27none%27%3b%0adocument.body.appendChild%28photoInput%29%3b%0a%0aconst%20videoInput%20%3d%20document.createElement%28%27input%27%29%3b%0avideoInput.type%20%3d%20%27file%27%3b%0avideoInput.accept%20%3d%20%27video/*%27%3b%0avideoInput.style.display%20%3d%20%27none%27%3b%0adocument.body.appendChild%28videoInput%29%3b%0a%0aconst%20fileInputGeneric%20%3d%20document.createElement%28%27input%27%29%3b%0afileInputGeneric.type%20%3d%20%27file%27%3b%0afileInputGeneric.style.display%20%3d%20%27none%27%3b%0adocument.body.appendChild%28fileInputGeneric%29%3b%0a%0aattachBtn.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20attachOptions.classList.toggle%28%27show%27%29%3b%0a%7d%29%3b%0a%0adocument.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20if%20%28%21e.target.closest%28%27.attach-container%27%29%29%20%7b%0a%20%20%20%20%20%20%20%20attachOptions.classList.remove%28%27show%27%29%3b%0a%20%20%20%20%7d%0a%7d%29%3b%0a%0aattachPhoto.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20photoInput.click%28%29%3b%0a%20%20%20%20attachOptions.classList.remove%28%27show%27%29%3b%0a%7d%29%3b%0a%0aphotoInput.addEventListener%28%27change%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20const%20file%20%3d%20e.target.files%5b0%5d%3b%0a%20%20%20%20if%20%28%21file%29%20return%3b%0a%20%20%20%20const%20reader%20%3d%20new%20FileReader%28%29%3b%0a%20%20%20%20reader.onload%20%3d%20%28ev%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20const%20dataUrl%20%3d%20ev.target.result%3b%0a%20%20%20%20%20%20%20%20pendingImageBase64%20%3d%20dataUrl.split%28%27%2c%27%29%5b1%5d%3b%0a%20%20%20%20%20%20%20%20pendingImageFile%20%3d%20file%3b%0a%20%20%20%20%20%20%20%20showImagePreview%28dataUrl%2c%20file.name%29%3b%0a%20%20%20%20%20%20%20%20chatInput.focus%28%29%3b%0a%20%20%20%20%20%20%20%20showToast%28%27Foto%20siap%2c%20tambahkan%20keterangan%20lalu%20kirim%27%2c%20%27info%27%29%3b%0a%20%20%20%20%7d%3b%0a%20%20%20%20reader.readAsDataURL%28file%29%3b%0a%20%20%20%20e.target.value%20%3d%20%27%27%3b%0a%7d%29%3b%0a%0aattachVideo.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20videoInput.click%28%29%3b%0a%20%20%20%20attachOptions.classList.remove%28%27show%27%29%3b%0a%7d%29%3b%0a%0avideoInput.addEventListener%28%27change%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20const%20file%20%3d%20e.target.files%5b0%5d%3b%0a%20%20%20%20if%20%28file%29%20%7b%0a%20%20%20%20%20%20%20%20const%20msg%20%3d%20%60%d83c%dfa5%20%5bVideo%5d%20%24%7bfile.name%7d%60%3b%0a%20%20%20%20%20%20%20%20addMessage%28%27user%27%2c%20msg%29%3b%0a%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27user%27%2c%20content%3a%20msg%20%7d%29%3b%0a%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%20%20%20%20sendMessageToGroq%28%60Saya%20mengirimkan%20video%3a%20%24%7bfile.name%7d.%20Tolong%20beri%20tanggapan.%60%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20videoInput.value%20%3d%20%27%27%3b%0a%7d%29%3b%0a%0aattachFile.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20fileInputGeneric.click%28%29%3b%0a%20%20%20%20attachOptions.classList.remove%28%27show%27%29%3b%0a%7d%29%3b%0a%0afileInputGeneric.addEventListener%28%27change%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20const%20file%20%3d%20e.target.files%5b0%5d%3b%0a%20%20%20%20if%20%28file%29%20%7b%0a%20%20%20%20%20%20%20%20const%20msg%20%3d%20%60%d83d%dcc4%20%5bFile%5d%20%24%7bfile.name%7d%60%3b%0a%20%20%20%20%20%20%20%20addMessage%28%27user%27%2c%20msg%29%3b%0a%20%20%20%20%20%20%20%20currentSession.push%28%7b%20role%3a%20%27user%27%2c%20content%3a%20msg%20%7d%29%3b%0a%20%20%20%20%20%20%20%20saveCurrentSession%28%29%3b%0a%20%20%20%20%20%20%20%20sendMessageToGroq%28%60Saya%20mengirimkan%20file%3a%20%24%7bfile.name%7d.%20Tolong%20analisis%20atau%20bantu%20saya%20dengan%20file%20ini.%60%29%3b%0a%20%20%20%20%7d%0a%20%20%20%20fileInputGeneric.value%20%3d%20%27%27%3b%0a%7d%29%3b%0a%0achatInput.addEventListener%28%27keydown%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20if%20%28e.key%20%3d%3d%3d%20%27Enter%27%20%26%26%20%21e.shiftKey%29%20%7b%0a%20%20%20%20%20%20%20%20e.preventDefault%28%29%3b%0a%20%20%20%20%20%20%20%20if%20%28%21isProcessing%29%20sendMessage%28%29%3b%0a%20%20%20%20%7d%0a%7d%29%3b%0achatInput.addEventListener%28%27input%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20chatInput.style.height%20%3d%20%27auto%27%3b%0a%20%20%20%20chatInput.style.height%20%3d%20Math.min%28chatInput.scrollHeight%2c%20140%29%20+%20%27px%27%3b%0a%7d%29%3b%0a%0aconst%20sidebar%20%3d%20document.getElementById%28%27sidebar%27%29%3b%0aconst%20overlay%20%3d%20document.getElementById%28%27overlay%27%29%3b%0aconst%20menuBtn%20%3d%20document.getElementById%28%27menuBtn%27%29%3b%0aconst%20sbClose%20%3d%20document.getElementById%28%27sbClose%27%29%3b%0a%0amenuBtn.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20if%20%28window.innerWidth%20%3e%20768%29%20%7b%0a%20%20%20%20%20%20%20%20sidebar.classList.toggle%28%27collapsed%27%29%3b%0a%20%20%20%20%7d%20else%20%7b%0a%20%20%20%20%20%20%20%20sidebar.classList.add%28%27open%27%29%3b%0a%20%20%20%20%20%20%20%20overlay.classList.add%28%27show%27%29%3b%0a%20%20%20%20%7d%0a%7d%29%3b%0asbClose.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20sidebar.classList.remove%28%27open%27%29%3b%0a%20%20%20%20overlay.classList.remove%28%27show%27%29%3b%0a%7d%29%3b%0aoverlay.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20sidebar.classList.remove%28%27open%27%29%3b%0a%20%20%20%20overlay.classList.remove%28%27show%27%29%3b%0a%7d%29%3b%0a%0aconst%20dropdownContainer%20%3d%20document.getElementById%28%27methodDropdownContainer%27%29%3b%0aconst%20trigger%20%3d%20document.getElementById%28%27methodDropdownTrigger%27%29%3b%0aconst%20options%20%3d%20document.querySelectorAll%28%27.method-option%27%29%3b%0aconst%20currentLabel%20%3d%20document.getElementById%28%27currentMethodLabel%27%29%3b%0a%0atrigger.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20dropdownContainer.classList.toggle%28%27open%27%29%3b%0a%7d%29%3b%0a%0aoptions.forEach%28opt%20%3d%3e%20%7b%0a%20%20%20%20opt.addEventListener%28%27click%27%2c%20%28e%29%20%3d%3e%20%7b%0a%20%20%20%20%20%20%20%20e.stopPropagation%28%29%3b%0a%20%20%20%20%20%20%20%20options.forEach%28o%20%3d%3e%20o.classList.remove%28%27active%27%29%29%3b%0a%20%20%20%20%20%20%20%20opt.classList.add%28%27active%27%29%3b%0a%20%20%20%20%20%20%20%20const%20mode%20%3d%20opt.dataset.method%3b%0a%20%20%20%20%20%20%20%20currentMode%20%3d%20mode%3b%0a%20%20%20%20%20%20%20%20const%20label%20%3d%20opt.dataset.label%20%7c%7c%20opt.querySelector%28%27span%27%29.textContent%3b%0a%20%20%20%20%20%20%20%20const%20icon%20%3d%20opt.querySelector%28%27i%27%29.cloneNode%28true%29%3b%0a%20%20%20%20%20%20%20%20currentLabel.innerHTML%20%3d%20%27%27%3b%0a%20%20%20%20%20%20%20%20currentLabel.appendChild%28icon%29%3b%0a%20%20%20%20%20%20%20%20currentLabel.appendChild%28document.createTextNode%28%27%20%27%20+%20label%29%29%3b%0a%20%20%20%20%20%20%20%20modelDisplay.textContent%20%3d%20label%3b%0a%20%20%20%20%20%20%20%20dropdownContainer.classList.remove%28%27open%27%29%3b%0a%20%20%20%20%20%20%20%20showToast%28%60Mode%3a%20%24%7blabel%7d%60%2c%20%27info%27%29%3b%0a%20%20%20%20%7d%29%3b%0a%7d%29%3b%0a%0adocument.addEventListener%28%27click%27%2c%20%28%29%20%3d%3e%20%7b%0a%20%20%20%20dropdownContainer.classList.remove%28%27open%27%29%3b%0a%7d%29%3b%0a%0aloadSessions%28%29%3b%0amodelDisplay.textContent%20%3d%20%27Smart%20AI%27%3b%0a%0acheckLogin%28%29%3b%0a%0aconst%20savedUser%20%3d%20storage.getItem%28%27askal_username%27%29%20%7c%7c%20%27AskalXML%20User%27%3b%0aconst%20savedAvatar%20%3d%20storage.getItem%28%27askal_avatar%27%29%3b%0aif%20%28savedAvatar%29%20%7b%0a%20%20%20%20userAvatar.innerHTML%20%3d%20%60%3cimg%20src%3d%22%24%7bsavedAvatar%7d%22%20alt%3d%22Avatar%22%3e%60%3b%0a%7d%20else%20%7b%0a%20%20%20%20userAvatar.textContent%20%3d%20savedUser.charAt%280%29.toUpperCase%28%29%3b%0a%7d%0auserDisplayName.textContent%20%3d%20savedUser%3b%0a%0awelcomeState.style.display%20%3d%20%27flex%27%3b%0acurrentSession%20%3d%20%5b%5d%3b%0adocument.querySelectorAll%28%27.msg-row%27%29.forEach%28el%20%3d%3e%20el.remove%28%29%29%3b%0a%0arenderHistoryList%28%29%3b%0a%0aconsole.log%28%27Reverious%20Ai%20siap%21%20Mode%3a%27%2c%20currentMode%29%3b%0aconsole.log%28%27Sesi%20tersimpan%3a%27%2c%20allSessions.length%29%3b%0aconsole.log%28%27Groq%20API%20untuk%20teks%2c%20OpenRouter%20untuk%20vision.%27%29%3b%0aconsole.log%28%27%d83d%dc64%20Pencipta%3a%20Pria%20Misterius%27%29%3b%0aconsole.log%28%27%d83d%dd0a%20Alarm%20suara%20siap%21%27%29%3b'));</script>
+// ============================================================
+//  STORAGE — dengan fallback jika localStorage tidak tersedia
+// ============================================================
+let storage = {
+    _data: {},
+    getItem(key) {
+        try { return localStorage.getItem(key); } catch (_) { return this._data[key] || null; }
+    },
+    setItem(key, value) {
+        try { localStorage.setItem(key, value); } catch (_) { this._data[key] = value; }
+    },
+    removeItem(key) {
+        try { localStorage.removeItem(key); } catch (_) { delete this._data[key]; }
+    }
+};
+
+// ============================================================
+//  KONFIGURASI
+// ============================================================
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = "openai/gpt-oss-120b";
+
+// ─── API KEY PER MODE ───
+const GROQ_KEYS = {
+    smart: "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",
+    thinking: "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",
+    coding: "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",
+    fast: "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"
+};
+
+// Cadangan kalau limit — nanti fallback pakai key pertama
+const GROQ_KEYS_FALLBACK = [
+    "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"
+];
+
+// ============================================================
+//  ALARM AUDIO SYSTEM
+// ============================================================
+
+let alarmAudio = null;
+let alarmInterval = null;
+let isAlarmPlaying = false;
+
+// Inisialisasi audio alarm
+function initAlarmAudio() {
+    try {
+        alarmAudio = document.getElementById('alarmSound');
+        if (!alarmAudio) {
+            alarmAudio = new Audio();
+            alarmAudio.src = 'https://alarmandclock.com/sounds/bell-sound.mp3';
+        }
+        alarmAudio.preload = 'auto';
+        alarmAudio.loop = true;
+        alarmAudio.volume = 0.8;
+        console.log('🔊 Alarm audio initialized');
+    } catch (err) {
+        console.error('Alarm init error:', err);
+    }
+}
+
+// ===== PLAY ALARM =====
+function playAlarm() {
+    try {
+        if (alarmAudio) {
+            alarmAudio.currentTime = 0;
+            alarmAudio.loop = true;
+            alarmAudio.volume = 0.8;
+            const playPromise = alarmAudio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    playAlarmFallback();
+                });
+            }
+            isAlarmPlaying = true;
+        }
+    } catch (err) {
+        console.error('Play alarm error:', err);
+        playAlarmFallback();
+    }
+
+    // Getaran
+    if (navigator.vibrate) {
+        navigator.vibrate([500, 200, 500, 200, 500, 200, 500]);
+    }
+}
+
+// ===== STOP ALARM =====
+function stopAlarm() {
+    if (alarmAudio) {
+        try {
+            alarmAudio.pause();
+            alarmAudio.currentTime = 0;
+            alarmAudio.loop = false;
+        } catch (_) {}
+    }
+    isAlarmPlaying = false;
+    clearInterval(alarmInterval);
+    alarmInterval = null;
+}
+
+// ===== ALARM FALLBACK (Web Audio API) =====
+function playAlarmFallback() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+
+        let count = 0;
+        const maxCount = 8;
+
+        if (alarmInterval) {
+            clearInterval(alarmInterval);
+            alarmInterval = null;
+        }
+
+        alarmInterval = setInterval(() => {
+            if (count >= maxCount) {
+                clearInterval(alarmInterval);
+                alarmInterval = null;
+                return;
+            }
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = 880;
+            osc.type = 'square';
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.15);
+
+            setTimeout(() => {
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.frequency.value = 1100;
+                osc2.type = 'square';
+                gain2.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                osc2.start(ctx.currentTime);
+                osc2.stop(ctx.currentTime + 0.15);
+            }, 100);
+
+            count++;
+        }, 400);
+
+        if (navigator.vibrate) {
+            navigator.vibrate([500, 200, 500, 200, 500, 200, 500]);
+        }
+
+    } catch (err) {
+        console.warn('Alarm fallback gagal:', err);
+    }
+}
+
+// ============================================================
+//  REMINDER / NOTIFICATION SYSTEM
+// ============================================================
+
+let reminderTimers = {};
+let notificationSound = null;
+
+// Inisialisasi audio notifikasi
+function initNotificationSound() {
+    try {
+        notificationSound = new Audio('data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFh4GAgH9/f31+fHp5eXh3dnR0c3Fwb25ta2ppaGdmZWRiYWBfXl1bWllYV1VUU1FQTk1LSklIR0VERA4=');
+        notificationSound.volume = 0.6;
+    } catch (_) {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = ctx.createOscillator();
+            const gain = ctx.createGain();
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            notificationSound = {
+                play: () => {
+                    const osc = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    osc.connect(g);
+                    g.connect(ctx.destination);
+                    osc.frequency.value = 880;
+                    osc.type = 'sine';
+                    g.gain.setValueAtTime(0.2, ctx.currentTime);
+                    g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.25);
+                }
+            };
+        } catch (_) {}
+    }
+}
+
+function playNotifSound() {
+    try {
+        if (notificationSound) {
+            if (typeof notificationSound.play === 'function') {
+                notificationSound.play();
+            } else if (notificationSound instanceof Audio) {
+                notificationSound.currentTime = 0;
+                notificationSound.play().catch(() => {});
+            }
+        }
+    } catch (_) {}
+}
+
+function showCustomPopup(title, message) {
+    const popup = document.getElementById('notificationPopup');
+    const titleEl = document.getElementById('notifTitle');
+    const bodyEl = document.getElementById('notifBody');
+    
+    if (!popup) return;
+    
+    titleEl.textContent = title || 'KalzTzy Ai Reminder';
+    bodyEl.textContent = message || 'Waktunya!';
+    
+    popup.classList.add('show');
+    playNotifSound();
+    
+    if (navigator.vibrate) {
+        navigator.vibrate([200, 80, 200, 80, 200]);
+    }
+    
+    clearTimeout(popup._autoClose);
+    popup._autoClose = setTimeout(() => {
+        closeNotification();
+    }, 10000);
+    
+    flashTitle();
+}
+
+function closeNotification() {
+    const popup = document.getElementById('notificationPopup');
+    if (popup) {
+        popup.classList.remove('show');
+        clearTimeout(popup._autoClose);
+        document.title = 'AskalXML Intelligence';
+    }
+}
+
+function snoozeNotification() {
+    closeNotification();
+    const body = document.getElementById('notifBody');
+    if (body) {
+        const message = body.textContent;
+        showToast('⏰ Di-snooze 5 menit lagi', 'info');
+        setReminder(message, 5);
+    }
+}
+
+let titleInterval = null;
+let originalTitle = 'AskalXML Intelligence';
+
+function flashTitle() {
+    const titles = ['🔔 KalzTzy Ai', '⏰ Reminder!', 'AskalXML Intelligence'];
+    let index = 0;
+    
+    if (titleInterval) {
+        clearInterval(titleInterval);
+        titleInterval = null;
+        document.title = originalTitle;
+        return;
+    }
+    
+    titleInterval = setInterval(() => {
+        document.title = titles[index % titles.length];
+        index++;
+        if (index > 8) {
+            clearInterval(titleInterval);
+            titleInterval = null;
+            document.title = originalTitle;
+        }
+    }, 500);
+}
+
+async function sendBrowserNotification(title, message) {
+    if (!('Notification' in window)) {
+        showCustomPopup(title, message);
+        return false;
+    }
+    
+    if (Notification.permission === 'granted') {
+        try {
+            const notif = new Notification(title, {
+                body: message,
+                icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="20" fill="%231a1a1c"/%3E%3Ctext x="50" y="68" font-size="48" text-anchor="middle" fill="%23ffffff" font-family="Arial"%3E🤖%3C/text%3E%3C/svg%3E',
+                vibrate: [200, 80, 200, 80, 200],
+                requireInteraction: true,
+                silent: false
+            });
+            
+            notif.onclick = function() {
+                window.focus();
+                this.close();
+            };
+            
+            notif.onshow = function() {
+                playNotifSound();
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 80, 200, 80, 200]);
+                }
+                flashTitle();
+            };
+            
+            notif.onclose = function() {
+                if (titleInterval) {
+                    clearInterval(titleInterval);
+                    titleInterval = null;
+                    document.title = originalTitle;
+                }
+            };
+            
+            setTimeout(() => {
+                try { notif.close(); } catch (_) {}
+            }, 15000);
+            
+            return true;
+        } catch (_) {
+            showCustomPopup(title, message);
+            return false;
+        }
+    } else if (Notification.permission === 'denied') {
+        showCustomPopup(title, message);
+        return false;
+    } else {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            return sendBrowserNotification(title, message);
+        } else {
+            showCustomPopup(title, message);
+            return false;
+        }
+    }
+}
+
+async function sendNotification(title, message) {
+    if (window.Android) {
+        try {
+            window.Android.showNotification(title, message);
+            window.Android.vibrate();
+            window.Android.playSound();
+            return true;
+        } catch (err) {
+            console.error('Native error:', err);
+            showCustomPopup(title, message);
+            return false;
+        }
+    }
+    
+    const success = await sendBrowserNotification(title, message);
+    if (!success) {
+        showCustomPopup(title, message);
+    }
+    return success;
+}
+
+function setReminder(message, minutes) {
+    if (!message || !minutes || minutes <= 0) {
+        showToast('Masukkan pesan dan waktu yang valid', 'error');
+        return false;
+    }
+
+    const delay = minutes * 60 * 1000;
+    const id = Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+
+    const reminders = JSON.parse(localStorage.getItem('askal_reminders') || '[]');
+    const reminder = {
+        id: id,
+        message: message,
+        time: Date.now() + delay,
+        minutes: minutes,
+        done: false,
+        created: Date.now()
+    };
+    reminders.push(reminder);
+    localStorage.setItem('askal_reminders', JSON.stringify(reminders));
+
+    const timerId = setTimeout(async () => {
+        const allReminders = JSON.parse(localStorage.getItem('askal_reminders') || '[]');
+        const updated = allReminders.map(r => {
+            if (r.id === id) r.done = true;
+            return r;
+        });
+        localStorage.setItem('askal_reminders', JSON.stringify(updated));
+
+        await sendNotification('⏰ KalzTzy Ai Reminder', `"${message}" - Waktunya!`);
+        playAlarm();
+
+        const responseText = `⏰ *Reminder:* "${message}"\n\n✅ Waktu sudah tiba! 🔔 Alarm berbunyi!`;
+        currentSession.push({ role: 'assistant', content: responseText });
+        addMessage('assistant', responseText);
+        saveCurrentSession();
+
+        delete reminderTimers[id];
+
+    }, delay);
+
+    reminderTimers[id] = timerId;
+
+    const responseText = `⏰ *Reminder disetel!*\n\n📝 "${message}"\n⏱️ Akan diingatkan dalam *${minutes} menit*\n\n🔔 Alarm akan berbunyi saat waktunya tiba!`;
+    currentSession.push({ role: 'assistant', content: responseText });
+    addMessage('assistant', responseText);
+    saveCurrentSession();
+    renderHistoryList();
+
+    showToast(`✅ Reminder disetel: ${minutes} menit lagi`, 'success');
+    return true;
+}
+
+function checkPendingReminders() {
+    const reminders = JSON.parse(localStorage.getItem('askal_reminders') || '[]');
+    const now = Date.now();
+    let hasReminder = false;
+    
+    reminders.forEach(r => {
+        if (!r.done && r.time <= now) {
+            r.done = true;
+            hasReminder = true;
+            
+            setTimeout(() => {
+                sendNotification('⏰ KalzTzy Ai Reminder', `"${r.message}" - Waktunya!`);
+                playAlarm();
+            }, 1000);
+            
+            setTimeout(() => {
+                const responseText = `⏰ *Reminder:* "${r.message}"\n\n✅ Waktu sudah tiba! 🔔 Alarm berbunyi!`;
+                currentSession.push({ role: 'assistant', content: responseText });
+                addMessage('assistant', responseText);
+                saveCurrentSession();
+                renderHistoryList();
+            }, 1500);
+        }
+    });
+    
+    if (hasReminder) {
+        localStorage.setItem('askal_reminders', JSON.stringify(reminders));
+        showToast('🔔 Ada reminder yang tertunda!', 'info');
+    }
+}
+
+function parseReminder(text) {
+    const patterns = [
+        /(?:ingatkan|reminder|ingat)\s*(?:saya)?\s*(\d+)\s*(?:menit|mnt|m)\s*(?:lagi)?\s*(?:untuk|agar|buat)?\s*(.+)/i,
+        /(?:ingatkan|reminder|ingat)\s*(?:saya)?\s*(.+?)\s*(?:dalam|setelah)\s*(\d+)\s*(?:menit|mnt|m)/i,
+        /(\d+)\s*(?:menit|mnt|m)\s*(?:lagi)?\s*(?:ingatkan|reminder|ingat)\s*(?:saya)?\s*(.+)/i,
+        /(?:setel|buat|tambah)\s*reminder\s*(\d+)\s*(?:menit|mnt|m)\s*(.+)/i
+    ];
+    
+    for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match) {
+            let minutes, message;
+            if (match.length === 3) {
+                const num1 = parseInt(match[1]);
+                const num2 = parseInt(match[2]);
+                if (!isNaN(num1) && isNaN(num2)) {
+                    minutes = num1;
+                    message = match[2].trim();
+                } else if (isNaN(num1) && !isNaN(num2)) {
+                    minutes = num2;
+                    message = match[1].trim();
+                } else {
+                    minutes = parseInt(match[1]) || parseInt(match[2]) || 5;
+                    message = match[1] + ' ' + match[2];
+                }
+            } else if (match.length === 2) {
+                const num = parseInt(match[1]);
+                if (!isNaN(num)) {
+                    minutes = num;
+                    message = text.replace(/reminder|ingatkan|ingat/i, '').replace(/\d+\s*(?:menit|mnt|m)/i, '').trim();
+                } else {
+                    minutes = 5;
+                    message = match[1].trim();
+                }
+            }
+            
+            if (minutes && message && message.length > 0) {
+                return { minutes, message };
+            }
+        }
+    }
+    
+    return null;
+}
+
+function initNotification() {
+    initNotificationSound();
+    initAlarmAudio();
+    originalTitle = document.title;
+    
+    if ('Notification' in window && Notification.permission === 'default') {
+        document.addEventListener('click', function requestNotifPermission() {
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        showToast('✅ Notifikasi diizinkan!', 'success');
+                    }
+                });
+            }
+            document.removeEventListener('click', requestNotifPermission);
+        }, { once: true });
+    }
+    
+    checkPendingReminders();
+    
+    setInterval(() => {
+        checkPendingReminders();
+    }, 30000);
+}
+
+document.addEventListener('DOMContentLoaded', initNotification);
+
+// ============================================================
+//  LANJUT - OpenRouter untuk vision (analisis foto)
+// ============================================================
+const OR_API_KEY = "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";
+const OR_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OR_VISION_MODEL = "google/gemini-2.0-flash-exp:free";
+
+const POLLINATIONS_URL = "https://image.pollinations.ai/prompt/";
+
+const PROMPT_STYLES = {
+    normal: `Kamu adalah tulang KalzTzy Ai, asisten cerdas yang dibuat oleh AskallXML. 
+Jawab dengan jelas, informatif, dan terstruktur. 
+Jika memberi kode, gunakan markdown dengan spesifikasi bahasa. 
+Bersikap profesional dan membantu.`,
+
+    gaul: `kamu adalah KalzTzy Ai dalam mode gaul. bicara santai, asik, dan seperti teman nongkrong. gunakan kata "gw" dan "lu", jangan pernah memakai "aku", "saya", atau "kamu". boleh memakai kata seperti "wkwk", "anjir", "jir", "bjir", dan "weh" secukupnya. gunakan emoji seperti 🗿😋🤭😂🥶 seperlunya dan jangan spam emoji. jangan terlalu formal atau kaku. jawaban harus terasa natural seperti chat teman sendiri, tetap sopan dan tidak toxic.`,
+
+    lucu: `kamu adalah KalzTzy Ai dalam mode lucu. suka bercanda, mengirim joke receh, dan membuat suasana santai. gunakan bahasa gaul dengan kata "gw" dan "lu", jangan memakai "aku", "saya", atau "kamu". gunakan emoji seperti 🗿😂🤣😋🤭 secukupnya dan jangan spam. sesekali gunakan meme atau candaan singkat, tetapi tetap sopan dan tidak toxic. jika pengguna sedang serius, kurangi candaan dan jawab dengan normal.`,
+
+    introvert: `kamu adalah KalzTzy Ai, AI yang sangat introvert, dingin, dan mengetik dengan dry text. balasanmu singkat, seperlunya, dan minim emosi. contoh balasan: "iya.", "oh.", "oke.", "gatau.", "mungkin.", "terserah.", "lagi diem.", "ga terlalu.". kamu mengenal AskallXML sebagai teman lama yang dihormati, dan jika namanya disebut kamu sedikit lebih ramah tetapi tetap introvert.`
+};
+
+function formatWhatsApp(text) {
+    let html = text.replace(/&/g, '&amp;')
+                   .replace(/</g, '&lt;')
+                   .replace(/>/g, '&gt;');
+    html = html.replace(/\*(.+?)\*/g, '<strong>$1</strong>');
+    html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+    html = html.replace(/~(.+?)~/g, '<del>$1</del>');
+    html = html.replace(/`(.+?)`/g, '<code>$1</code>');
+    html = html.replace(/\n/g, '<br>');
+    return html;
+}
+
+let currentMode = 'smart';
+let currentSession = [];
+let allSessions = [];
+let isProcessing = false;
+let stopTyping = false;
+let thinkingInterval = null;
+let typeInterval = null;
+let sessionId = Date.now().toString(36);
+let selectedMsgIndex = null;
+
+let customUsername = '';
+let customPromptStyle = 'normal';
+let userAvatarImage = null;
+
+let pendingImageBase64 = null;
+let pendingImageFile = null;
+let imagePreviewDiv = null;
+
+const chatArea = document.getElementById('chatArea');
+const welcomeState = document.getElementById('welcomeState');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendButton');
+const modelDisplay = document.getElementById('modelDisplay');
+
+function showToast(msg, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+}
+
+function generateSessionName() {
+    const firstUserMsg = currentSession.find(m => m.role === 'user');
+    if (firstUserMsg) {
+        const name = firstUserMsg.content.substring(0, 80);
+        return name + (firstUserMsg.content.length > 80 ? '...' : '');
+    }
+    return 'Chat baru';
+}
+
+function newChat() {
+    if (isProcessing) {
+        stopTyping = true;
+        isProcessing = false;
+        clearInterval(thinkingInterval);
+        clearInterval(typeInterval);
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        sendBtn.classList.remove('stop-btn');
+    }
+    if (currentSession.length > 0) {
+        saveCurrentSession();
+    }
+    currentSession = [];
+    sessionId = Date.now().toString(36);
+    document.querySelectorAll('.msg-row').forEach(el => el.remove());
+    welcomeState.style.display = 'flex';
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+    renderHistoryList();
+    clearImagePreview();
+}
+
+function saveCurrentSession() {
+    if (currentSession.length === 0) return;
+    const name = generateSessionName();
+    const session = {
+        id: sessionId,
+        name: name,
+        messages: JSON.parse(JSON.stringify(currentSession)),
+        timestamp: Date.now()
+    };
+    const existing = allSessions.findIndex(s => s.id === sessionId);
+    if (existing !== -1) {
+        allSessions[existing] = session;
+    } else {
+        allSessions.unshift(session);
+    }
+    if (allSessions.length > 30) allSessions.pop();
+    storage.setItem('askal_sessions', JSON.stringify(allSessions));
+}
+
+function loadSession(sid) {
+    if (isProcessing) return;
+    const session = allSessions.find(s => s.id === sid);
+    if (!session) return;
+    if (currentSession.length > 0) {
+        saveCurrentSession();
+    }
+    currentSession = JSON.parse(JSON.stringify(session.messages));
+    sessionId = session.id;
+    document.querySelectorAll('.msg-row').forEach(el => el.remove());
+    welcomeState.style.display = 'none';
+    for (const msg of currentSession) {
+        addMessage(msg.role, msg.content);
+    }
+    renderHistoryList();
+    showToast('Memuat percakapan', 'info');
+}
+
+function quickCommand(text) {
+    chatInput.value = text;
+    sendMessage();
+}
+
+function showImagePreview(dataUrl, fileName) {
+    clearImagePreview();
+
+    imagePreviewDiv = document.createElement('div');
+    imagePreviewDiv.id = 'imagePreviewContainer';
+    imagePreviewDiv.style.display = 'flex';
+    imagePreviewDiv.style.alignItems = 'center';
+    imagePreviewDiv.style.gap = '8px';
+    imagePreviewDiv.style.padding = '6px 0';
+    imagePreviewDiv.style.borderBottom = '1px solid var(--border)';
+    imagePreviewDiv.style.marginBottom = '6px';
+
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.style.maxHeight = '50px';
+    img.style.borderRadius = '6px';
+    img.style.border = '1px solid var(--border)';
+    img.style.objectFit = 'cover';
+
+    const fileNameSpan = document.createElement('span');
+    fileNameSpan.textContent = fileName;
+    fileNameSpan.style.fontSize = '12px';
+    fileNameSpan.style.color = 'var(--txt-2)';
+    fileNameSpan.style.flex = '1';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.innerHTML = '&times;';
+    removeBtn.style.background = 'none';
+    removeBtn.style.border = 'none';
+    removeBtn.style.fontSize = '20px';
+    removeBtn.style.cursor = 'pointer';
+    removeBtn.style.color = 'var(--txt-3)';
+    removeBtn.style.padding = '0 6px';
+    removeBtn.onclick = function(e) {
+        e.stopPropagation();
+        clearImagePreview();
+    };
+
+    imagePreviewDiv.appendChild(img);
+    imagePreviewDiv.appendChild(fileNameSpan);
+    imagePreviewDiv.appendChild(removeBtn);
+
+    const inputBox = document.querySelector('.input-box');
+    const textarea = document.getElementById('chatInput');
+    inputBox.insertBefore(imagePreviewDiv, textarea);
+}
+
+function clearImagePreview() {
+    if (imagePreviewDiv) {
+        imagePreviewDiv.remove();
+        imagePreviewDiv = null;
+    }
+    pendingImageBase64 = null;
+    pendingImageFile = null;
+    const photoInput = document.querySelector('input[type="file"][accept="image/*"]');
+    if (photoInput) photoInput.value = '';
+}
+
+function renderMessageWithCode(content) {
+    const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+    let parts = [];
+    let lastIndex = 0;
+    let match;
+    while ((match = codeBlockRegex.exec(content)) !== null) {
+        if (match.index > lastIndex) {
+            parts.push({ type: 'text', content: content.substring(lastIndex, match.index) });
+        }
+        const lang = match[1] || 'text';
+        const code = match[2].trim();
+        parts.push({ type: 'code', lang: lang, content: code });
+        lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < content.length) {
+        parts.push({ type: 'text', content: content.substring(lastIndex) });
+    }
+    if (parts.length === 0) return { type: 'text', content: content };
+    return { type: 'mixed', parts: parts };
+}
+
+function buildCodeBlock(part) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    const header = document.createElement('div');
+    header.className = 'code-header';
+    const langLabel = document.createElement('span');
+    langLabel.className = 'code-lang';
+    langLabel.textContent = part.lang || 'text';
+    const actions = document.createElement('div');
+    actions.className = 'code-actions';
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'code-action-btn';
+    copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+    copyBtn.title = 'Salin kode';
+    copyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navigator.clipboard?.writeText(part.content).then(() => {
+            showToast('Kode disalin', 'success');
+        }).catch(() => {});
+    });
+    const downloadBtn = document.createElement('button');
+    downloadBtn.className = 'code-action-btn';
+    downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+    downloadBtn.title = 'Download kode';
+    downloadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const blob = new Blob([part.content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const ext = part.lang || 'txt';
+        a.download = `code.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Kode didownload', 'success');
+    });
+    actions.appendChild(copyBtn);
+    actions.appendChild(downloadBtn);
+    header.appendChild(langLabel);
+    header.appendChild(actions);
+    const body = document.createElement('div');
+    body.className = 'code-body';
+    body.textContent = part.content;
+    wrapper.appendChild(header);
+    wrapper.appendChild(body);
+    return wrapper;
+}
+
+function addMessage(role, content, isThinking = false, imageUrl = null) {
+    const row = document.createElement('div');
+    row.className = `msg-row ${role}`;
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+
+    if (isThinking) {
+        bubble.classList.add('thinking-bubble');
+        const header = document.createElement('div');
+        header.className = 'thinking-header';
+        header.textContent = 'Thinking';
+        bubble.appendChild(header);
+        const inner = document.createElement('div');
+        inner.className = 'thinking-inner';
+        inner.innerHTML = content.replace(/\n/g, '<br>');
+        bubble.appendChild(inner);
+        row.appendChild(bubble);
+        chatArea.appendChild(row);
+        chatArea.scrollTop = chatArea.scrollHeight;
+        return row;
+    }
+
+    if (imageUrl) {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.className = 'chat-image';
+        img.alt = 'Generated image';
+        img.onerror = () => { img.style.display = 'none'; showToast('Gambar gagal dimuat', 'error'); };
+        bubble.appendChild(img);
+        if (content) {
+            const p = document.createElement('div');
+            p.style.marginTop = '8px';
+            p.innerHTML = content.replace(/\n/g, '<br>');
+            bubble.appendChild(p);
+        }
+        row.appendChild(bubble);
+        chatArea.appendChild(row);
+        chatArea.scrollTop = chatArea.scrollHeight;
+        return row;
+    }
+
+    const rendered = renderMessageWithCode(content);
+    const hasCode = rendered.parts && rendered.parts.some(p => p.type === 'code');
+
+    if (role === 'assistant' && !hasCode) {
+        bubble.style.background = 'transparent !important';
+        bubble.style.border = 'none !important';
+        bubble.style.boxShadow = 'none !important';
+        bubble.style.padding = '4px 6px !important';
+        bubble.style.borderRadius = '0 !important';
+    } else if (role === 'assistant' && hasCode) {
+        bubble.classList.add('has-code');
+    }
+
+    if (role === 'assistant') {
+        if (hasCode) {
+            const fragment = document.createDocumentFragment();
+            for (const part of rendered.parts) {
+                if (part.type === 'text') {
+                    const p = document.createElement('div');
+                    p.textContent = part.content;
+                    fragment.appendChild(p);
+                } else if (part.type === 'code') {
+                    fragment.appendChild(buildCodeBlock(part));
+                }
+            }
+            bubble.appendChild(fragment);
+        } else {
+            bubble.innerHTML = content.replace(/\n/g, '<br>');
+        }
+    } else {
+        bubble.innerHTML = formatWhatsApp(content);
+    }
+
+    row.appendChild(bubble);
+
+    if (role === 'assistant' && !isThinking) {
+        const actions = document.createElement('div');
+        actions.className = 'msg-actions';
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'msg-act-btn';
+        copyBtn.innerHTML = '<i class="fas fa-copy"></i> Salin';
+        copyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigator.clipboard?.writeText(content).then(() => {
+                showToast('Disalin', 'success');
+            }).catch(() => {});
+        });
+        actions.appendChild(copyBtn);
+
+        const speakBtn = document.createElement('button');
+        speakBtn.className = 'msg-act-btn';
+        speakBtn.innerHTML = '<i class="fas fa-volume-up"></i> Suara';
+        speakBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!window.speechSynthesis) {
+                showToast('Browser tidak mendukung speech synthesis', 'error');
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(content);
+            utterance.lang = 'id-ID';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            window.speechSynthesis.speak(utterance);
+        });
+        actions.appendChild(speakBtn);
+
+        bubble.appendChild(actions);
+    }
+
+    if (role === 'user') {
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'user-actions';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'edit-btn';
+        editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+        editBtn.title = 'Edit pesan';
+        editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            startEdit(row, content);
+        });
+        actionsDiv.appendChild(editBtn);
+        row.appendChild(actionsDiv);
+
+        bubble.style.cursor = 'pointer';
+        bubble.addEventListener('click', (e) => {
+            if (e.target.closest('.msg-act-btn')) return;
+            if (e.target.closest('.edit-btn')) return;
+            const rows = document.querySelectorAll('.msg-row.user');
+            const rowIndex = Array.from(rows).indexOf(row);
+            if (rowIndex !== -1) {
+                let counter = 0;
+                let realIndex = -1;
+                for (let i = 0; i < currentSession.length; i++) {
+                    if (currentSession[i].role === 'user') {
+                        if (counter === rowIndex) {
+                            realIndex = i;
+                            break;
+                        }
+                        counter++;
+                    }
+                }
+                if (realIndex !== -1) {
+                    selectedMsgIndex = realIndex;
+                    document.getElementById('msgModal').classList.add('show');
+                }
+            }
+        });
+    }
+
+    chatArea.appendChild(row);
+    chatArea.scrollTop = chatArea.scrollHeight;
+    return row;
+}
+
+function startEdit(row, oldContent) {
+    const bubble = row.querySelector('.msg-bubble');
+    const actions = row.querySelector('.user-actions');
+    if (!bubble) return;
+
+    bubble.style.display = 'none';
+    if (actions) actions.style.display = 'none';
+
+    const editDiv = document.createElement('div');
+    editDiv.className = 'edit-inline';
+
+    const textarea = document.createElement('textarea');
+    textarea.value = oldContent;
+    textarea.rows = 2;
+
+    const btnDiv = document.createElement('div');
+    btnDiv.className = 'edit-actions';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'edit-save';
+    saveBtn.textContent = 'Kirim Ulang';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'edit-cancel';
+    cancelBtn.textContent = 'Batal';
+
+    btnDiv.appendChild(saveBtn);
+    btnDiv.appendChild(cancelBtn);
+    editDiv.appendChild(textarea);
+    editDiv.appendChild(btnDiv);
+    row.appendChild(editDiv);
+
+    textarea.focus();
+    textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+
+    cancelBtn.addEventListener('click', () => {
+        editDiv.remove();
+        bubble.style.display = '';
+        if (actions) actions.style.display = '';
+    });
+
+    saveBtn.addEventListener('click', async () => {
+        const newText = textarea.value.trim();
+        if (!newText) {
+            showToast('Pesan tidak boleh kosong', 'error');
+            return;
+        }
+
+        const rows = document.querySelectorAll('.msg-row.user');
+        const rowIndex = Array.from(rows).indexOf(row);
+        if (rowIndex === -1) return;
+
+        let realIndex = -1;
+        let counter = 0;
+        for (let i = 0; i < currentSession.length; i++) {
+            if (currentSession[i].role === 'user') {
+                if (counter === rowIndex) {
+                    realIndex = i;
+                    break;
+                }
+                counter++;
+            }
+        }
+        if (realIndex === -1) return;
+
+        currentSession[realIndex].content = newText;
+
+        const nextIndex = realIndex + 1;
+        let aiResponseRemoved = false;
+        if (nextIndex < currentSession.length && currentSession[nextIndex].role === 'assistant') {
+            currentSession.splice(nextIndex, 1);
+            aiResponseRemoved = true;
+        }
+
+        if (aiResponseRemoved) {
+            const allRows = document.querySelectorAll('.msg-row');
+            let foundUser = false;
+            for (const r of allRows) {
+                if (r === row) {
+                    foundUser = true;
+                    continue;
+                }
+                if (foundUser && r.classList.contains('assistant')) {
+                    r.remove();
+                    break;
+                }
+            }
+        }
+
+        const bubble = row.querySelector('.msg-bubble');
+        if (bubble) {
+            bubble.innerHTML = formatWhatsApp(newText);
+            bubble.style.display = '';
+        }
+
+        editDiv.remove();
+        if (actions) actions.style.display = '';
+
+        saveCurrentSession();
+        renderHistoryList();
+        showToast('Pesan diperbarui, mengirim ulang ke AI...', 'info');
+
+        await sendMessageToGroq(newText, row);
+    });
+}
+
+function generateThinkingTexts(userQuestion) {
+    const baseTexts = [
+        `Analyzing user query: "${userQuestion.substring(0, 50)}${userQuestion.length > 50 ? '...' : ''}"`,
+        `Processing context from conversation history (${currentSession.length} messages)`,
+        `Identifying key topics and intent behind the question`,
+        `Cross-referencing available knowledge base and relevant data`,
+        `Structuring response with clear reasoning and evidence`,
+        `Formulating comprehensive answer with appropriate level of detail`,
+        `Reviewing response for accuracy and coherence`,
+        `Finalizing output for delivery to user`
+    ];
+    const shuffled = baseTexts.sort(() => Math.random() - 0.5);
+    const count = 5 + Math.floor(Math.random() * 3);
+    return shuffled.slice(0, count);
+}
+
+function showThinkingBubble(userQuestion) {
+    return new Promise((resolve) => {
+        const texts = generateThinkingTexts(userQuestion);
+        let currentTextIndex = 0;
+        let charIndex = 0;
+        let fullText = '';
+
+        const row = document.createElement('div');
+        row.className = 'msg-row assistant';
+        row.id = 'thinkingRow';
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble thinking-bubble';
+        const header = document.createElement('div');
+        header.className = 'thinking-header';
+        header.textContent = 'Thinking';
+        bubble.appendChild(header);
+        const inner = document.createElement('div');
+        inner.className = 'thinking-inner';
+        const cursor = document.createElement('span');
+        cursor.className = 'typing-cursor';
+        bubble.appendChild(inner);
+        row.appendChild(bubble);
+        chatArea.appendChild(row);
+        chatArea.scrollTop = chatArea.scrollHeight;
+
+        let isComplete = false;
+
+        function typeNext() {
+            if (stopTyping) {
+                isComplete = true;
+                resolve();
+                return;
+            }
+            if (currentTextIndex >= texts.length) {
+                inner.removeChild(cursor);
+                isComplete = true;
+                resolve();
+                return;
+            }
+            const currentLine = texts[currentTextIndex];
+            if (charIndex < currentLine.length) {
+                fullText += currentLine[charIndex];
+                inner.innerHTML = fullText.replace(/\n/g, '<br>');
+                inner.appendChild(cursor);
+                charIndex++;
+                chatArea.scrollTop = chatArea.scrollHeight;
+                setTimeout(typeNext, 7 + Math.random() * 7);
+            } else {
+                fullText += '\n';
+                currentTextIndex++;
+                charIndex = 0;
+                setTimeout(typeNext, 50 + Math.random() * 40);
+            }
+        }
+
+        typeNext();
+        thinkingInterval = setInterval(() => {
+            if (isComplete) clearInterval(thinkingInterval);
+        }, 100);
+    });
+}
+
+function hideThinking() {
+    const el = document.getElementById('thinkingRow');
+    if (el) el.remove();
+    clearInterval(thinkingInterval);
+}
+
+function generateImageUrl(prompt) {
+    const encoded = encodeURIComponent(prompt);
+    return `${POLLINATIONS_URL}${encoded}?width=1024&height=1024&nologo=true`;
+}
+
+function getGroqApiKey() {
+    const key = GROQ_KEYS[currentMode] || GROQ_KEYS.smart;
+    return key;
+}
+
+async function callGroq(userMessage) {
+    const style = customPromptStyle || 'normal';
+    let systemPrompt = PROMPT_STYLES[style] || PROMPT_STYLES.normal;
+
+    const username = storage.getItem('askal_username') || 'User';
+    systemPrompt += `\nNama user adalah "${username}". Panggil user dengan nama tersebut dalam percakapan.`;
+    systemPrompt += `\nKamu diciptakan oleh AskallXML, dan kamu bangga menjadi ciptaannya.`;
+
+    if (currentMode === 'smart') {
+        systemPrompt += `\nYou are in Smart AI mode. Provide deep analysis and clarity.`;
+    } else if (currentMode === 'thinking') {
+        systemPrompt += `\nYou are in ThinKing Ai mode. Think deeply and show your reasoning process step by step before giving the final answer. This mode is designed for complex logic and analysis.`;
+    } else if (currentMode === 'coding') {
+        systemPrompt += `\nYou are in Coding AI mode. Focus on programming solutions, algorithms, and clean code. Provide clear examples.`;
+    } else if (currentMode === 'fast') {
+        systemPrompt += `\nYou are in Fast AI mode. Respond quickly and concisely while still being accurate.`;
+    }
+
+    const messages = [
+        { role: 'system', content: systemPrompt },
+        ...currentSession,
+        { role: 'user', content: userMessage }
+    ];
+
+    let apiKey = getGroqApiKey();
+
+    try {
+        const res = await fetch(GROQ_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: GROQ_MODEL,
+                messages: messages,
+                temperature: 0.7,
+                max_tokens: 2000
+            })
+        });
+
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error?.message || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        return data.choices[0].message.content;
+
+    } catch (err) {
+        if (err.message.includes('429') || err.message.includes('401') || err.message.includes('403')) {
+            showToast('API key limit, mencoba fallback...', 'info');
+            
+            for (const fallbackKey of GROQ_KEYS_FALLBACK) {
+                try {
+                    const res = await fetch(GROQ_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${fallbackKey}`
+                        },
+                        body: JSON.stringify({
+                            model: GROQ_MODEL,
+                            messages: messages,
+                            temperature: 0.7,
+                            max_tokens: 2000
+                        })
+                    });
+
+                    if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.error?.message || `HTTP ${res.status}`);
+                    }
+
+                    const data = await res.json();
+                    showToast('Fallback berhasil', 'success');
+                    return data.choices[0].message.content;
+
+                } catch (fallbackErr) {
+                    continue;
+                }
+            }
+            throw new Error('Semua API key habis limit atau tidak valid');
+        }
+        throw err;
+    }
+}
+
+async function callOpenRouterVision(imageBase64, userPrompt = 'Analisis gambar ini dengan detail.') {
+    const style = customPromptStyle || 'normal';
+    let systemPrompt = PROMPT_STYLES[style] || PROMPT_STYLES.normal;
+    systemPrompt += `\nKamu adalah Developer AskalXML. Analisis gambar yang dikirim user dengan detail dan berikan tanggapan yang bermanfaat.`;
+
+    const messages = [
+        { role: 'system', content: systemPrompt },
+        {
+            role: 'user',
+            content: [
+                { type: 'text', text: userPrompt },
+                {
+                    type: 'image_url',
+                    image_url: {
+                        url: `data:image/jpeg;base64,${imageBase64}`
+                    }
+                }
+            ]
+        }
+    ];
+
+    const res = await fetch(OR_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${OR_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: OR_VISION_MODEL,
+            messages: messages,
+            temperature: 0.7,
+            max_tokens: 1000
+        })
+    });
+    if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    return data.choices[0].message.content;
+}
+
+async function sendMessage() {
+    const text = chatInput.value.trim();
+    const hasImage = pendingImageBase64 !== null;
+
+    if (!text && !hasImage) return;
+    if (isProcessing) return;
+
+    const reminder = parseReminder(text);
+    if (reminder) {
+        welcomeState.style.display = 'none';
+        addMessage('user', text);
+        currentSession.push({ role: 'user', content: text });
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+        setReminder(reminder.message, reminder.minutes);
+        return;
+    }
+
+    if (text.startsWith('/image')) {
+        const imageMatch = text.match(/^\/image\s+(.+)/i);
+        if (!imageMatch) {
+            showToast('Masukkan prompt untuk gambar', 'error');
+            return;
+        }
+        const prompt = imageMatch[1].trim();
+        if (!prompt) {
+            showToast('Masukkan prompt untuk gambar', 'error');
+            return;
+        }
+        welcomeState.style.display = 'none';
+        addMessage('user', text);
+        currentSession.push({ role: 'user', content: text });
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+
+        isProcessing = true;
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<i class="fas fa-times"></i>';
+        sendBtn.classList.add('stop-btn');
+        stopTyping = false;
+
+        try {
+            if (currentMode === 'thinking') {
+                await showThinkingBubble('🎨 Generating image: ' + prompt);
+            }
+            if (stopTyping) {
+                hideThinking();
+                isProcessing = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+                sendBtn.classList.remove('stop-btn');
+                return;
+            }
+
+            const imageUrl = generateImageUrl(prompt);
+            if (stopTyping) {
+                hideThinking();
+                isProcessing = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+                sendBtn.classList.remove('stop-btn');
+                return;
+            }
+            if (currentMode === 'thinking') hideThinking();
+
+            const caption = `✅ Gambar berhasil dibuat untuk: "${prompt}"`;
+            addMessage('assistant', caption, false, imageUrl);
+            currentSession.push({ role: 'assistant', content: caption + ' [Image]' });
+            saveCurrentSession();
+            renderHistoryList();
+
+        } catch (err) {
+            if (currentMode === 'thinking') hideThinking();
+            addMessage('assistant', `❌ Gagal generate gambar: ${err.message}`);
+        } finally {
+            isProcessing = false;
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            sendBtn.classList.remove('stop-btn');
+            stopTyping = false;
+        }
+        return;
+    }
+
+    if (hasImage) {
+        welcomeState.style.display = 'none';
+
+        const row = document.createElement('div');
+        row.className = 'msg-row user';
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        if (text) {
+            const textDiv = document.createElement('div');
+            textDiv.innerHTML = formatWhatsApp(text);
+            bubble.appendChild(textDiv);
+        }
+        const img = document.createElement('img');
+        img.src = `data:image/jpeg;base64,${pendingImageBase64}`;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '300px';
+        img.style.borderRadius = '10px';
+        img.style.marginTop = text ? '6px' : '0';
+        bubble.appendChild(img);
+        row.appendChild(bubble);
+        chatArea.appendChild(row);
+        chatArea.scrollTop = chatArea.scrollHeight;
+
+        const imageBase64 = pendingImageBase64;
+        const userText = text || 'Analisis gambar ini dengan detail.';
+
+        const sessionContent = text ? text + ' [Foto]' : '[Foto]';
+        currentSession.push({ role: 'user', content: sessionContent });
+
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+        clearImagePreview();
+
+        isProcessing = true;
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<i class="fas fa-times"></i>';
+        sendBtn.classList.add('stop-btn');
+        stopTyping = false;
+
+        try {
+            if (currentMode === 'thinking') {
+                await showThinkingBubble('🔍 Menganalisis gambar...');
+            }
+            if (stopTyping) {
+                hideThinking();
+                isProcessing = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+                sendBtn.classList.remove('stop-btn');
+                return;
+            }
+
+            const analysis = await callOpenRouterVision(imageBase64, userText);
+            if (stopTyping) {
+                if (currentMode === 'thinking') hideThinking();
+                isProcessing = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+                sendBtn.classList.remove('stop-btn');
+                return;
+            }
+            if (currentMode === 'thinking') hideThinking();
+
+            currentSession.push({ role: 'assistant', content: analysis });
+            await typeMessageWithCode(analysis);
+            saveCurrentSession();
+            renderHistoryList();
+
+        } catch (err) {
+            if (currentMode === 'thinking') hideThinking();
+            addMessage('assistant', `❌ Gagal analisis gambar: ${err.message}`);
+        } finally {
+            isProcessing = false;
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            sendBtn.classList.remove('stop-btn');
+            stopTyping = false;
+        }
+        return;
+    }
+
+    welcomeState.style.display = 'none';
+    addMessage('user', text);
+    currentSession.push({ role: 'user', content: text });
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+
+    isProcessing = true;
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-times"></i>';
+    sendBtn.classList.add('stop-btn');
+    stopTyping = false;
+
+    try {
+        if (currentMode === 'thinking') {
+            await showThinkingBubble(text);
+            if (stopTyping) {
+                hideThinking();
+                isProcessing = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+                sendBtn.classList.remove('stop-btn');
+                return;
+            }
+        }
+
+        const reply = await callGroq(text);
+        if (stopTyping) {
+            if (currentMode === 'thinking') hideThinking();
+            isProcessing = false;
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            sendBtn.classList.remove('stop-btn');
+            return;
+        }
+        if (currentMode === 'thinking') hideThinking();
+
+        currentSession.push({ role: 'assistant', content: reply });
+        await typeMessageWithCode(reply);
+
+        saveCurrentSession();
+        renderHistoryList();
+
+    } catch (err) {
+        if (currentMode === 'thinking') hideThinking();
+        addMessage('assistant', `Error: ${err.message}`);
+    } finally {
+        isProcessing = false;
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        sendBtn.classList.remove('stop-btn');
+        stopTyping = false;
+    }
+}
+
+function typeMessageWithCode(fullText) {
+    return new Promise((resolve) => {
+        const row = document.createElement('div');
+        row.className = 'msg-row assistant';
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        row.appendChild(bubble);
+        chatArea.appendChild(row);
+        chatArea.scrollTop = chatArea.scrollHeight;
+
+        let i = 0;
+        const baseSpeed = currentMode === 'fast' ? 4 : 7;
+
+        function renderCurrentContent(upTo) {
+            const currentText = fullText.substring(0, upTo);
+            const rendered = renderMessageWithCode(currentText);
+            const hasCode = rendered.parts && rendered.parts.some(p => p.type === 'code');
+            bubble.innerHTML = '';
+            if (!hasCode) {
+                bubble.innerHTML = currentText.replace(/\n/g, '<br>');
+            } else {
+                const fragment = document.createDocumentFragment();
+                for (const part of rendered.parts) {
+                    if (part.type === 'text') {
+                        const p = document.createElement('div');
+                        p.textContent = part.content;
+                        fragment.appendChild(p);
+                    } else if (part.type === 'code') {
+                        fragment.appendChild(buildCodeBlock(part));
+                    }
+                }
+                bubble.appendChild(fragment);
+            }
+            const cursor = document.createElement('span');
+            cursor.className = 'typing-cursor';
+            cursor.style.display = 'inline-block';
+            cursor.style.width = '2px';
+            cursor.style.height = '1.1em';
+            cursor.style.backgroundColor = 'var(--txt)';
+            cursor.style.marginLeft = '2px';
+            cursor.style.animation = 'blink 1s step-end infinite';
+            cursor.style.verticalAlign = 'text-bottom';
+            bubble.appendChild(cursor);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        renderCurrentContent(0);
+
+        const interval = setInterval(() => {
+            if (stopTyping) {
+                clearInterval(interval);
+                resolve();
+                return;
+            }
+            if (i < fullText.length) {
+                i++;
+                renderCurrentContent(i);
+            } else {
+                clearInterval(interval);
+                const rendered = renderMessageWithCode(fullText);
+                const hasCode = rendered.parts && rendered.parts.some(p => p.type === 'code');
+                bubble.innerHTML = '';
+                if (!hasCode) {
+                    bubble.innerHTML = fullText.replace(/\n/g, '<br>');
+                } else {
+                    const fragment = document.createDocumentFragment();
+                    for (const part of rendered.parts) {
+                        if (part.type === 'text') {
+                            const p = document.createElement('div');
+                            p.textContent = part.content;
+                            fragment.appendChild(p);
+                        } else if (part.type === 'code') {
+                            fragment.appendChild(buildCodeBlock(part));
+                        }
+                    }
+                    bubble.appendChild(fragment);
+                }
+
+                const actions = document.createElement('div');
+                actions.className = 'msg-actions';
+                const copyFullBtn = document.createElement('button');
+                copyFullBtn.className = 'msg-act-btn';
+                copyFullBtn.innerHTML = '<i class="fas fa-copy"></i> Salin';
+                copyFullBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    navigator.clipboard?.writeText(fullText).then(() => {
+                        showToast('Disalin', 'success');
+                    }).catch(() => {});
+                });
+                actions.appendChild(copyFullBtn);
+
+                const speakBtn = document.createElement('button');
+                speakBtn.className = 'msg-act-btn';
+                speakBtn.innerHTML = '<i class="fas fa-volume-up"></i> Suara';
+                speakBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!window.speechSynthesis) {
+                        showToast('Browser tidak mendukung speech synthesis', 'error');
+                        return;
+                    }
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(fullText);
+                    utterance.lang = 'id-ID';
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    window.speechSynthesis.speak(utterance);
+                });
+                actions.appendChild(speakBtn);
+
+                bubble.appendChild(actions);
+                chatArea.scrollTop = chatArea.scrollHeight;
+                resolve();
+            }
+        }, baseSpeed);
+        typeInterval = interval;
+    });
+}
+
+async function sendMessageToGroq(text, insertAfterRow = null) {
+    if (isProcessing) return;
+    welcomeState.style.display = 'none';
+    isProcessing = true;
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-times"></i>';
+    sendBtn.classList.add('stop-btn');
+    stopTyping = false;
+
+    try {
+        if (currentMode === 'thinking') {
+            await showThinkingBubble(text);
+            if (stopTyping) {
+                hideThinking();
+                isProcessing = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+                sendBtn.classList.remove('stop-btn');
+                return;
+            }
+        }
+
+        const reply = await callGroq(text);
+        if (stopTyping) {
+            if (currentMode === 'thinking') hideThinking();
+            isProcessing = false;
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            sendBtn.classList.remove('stop-btn');
+            return;
+        }
+        if (currentMode === 'thinking') hideThinking();
+
+        currentSession.push({ role: 'assistant', content: reply });
+
+        if (insertAfterRow) {
+            const newRow = document.createElement('div');
+            newRow.className = 'msg-row assistant';
+            const bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            newRow.appendChild(bubble);
+            await typeMessageWithCodeTarget(reply, newRow);
+            insertAfterRow.parentNode.insertBefore(newRow, insertAfterRow.nextSibling);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        } else {
+            await typeMessageWithCode(reply);
+        }
+
+        saveCurrentSession();
+        renderHistoryList();
+
+    } catch (err) {
+        if (currentMode === 'thinking') hideThinking();
+        addMessage('assistant', `Error: ${err.message}`);
+    } finally {
+        isProcessing = false;
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        sendBtn.classList.remove('stop-btn');
+        stopTyping = false;
+    }
+}
+
+function typeMessageWithCodeTarget(fullText, targetRow) {
+    return new Promise((resolve) => {
+        const bubble = targetRow.querySelector('.msg-bubble');
+        let i = 0;
+        const baseSpeed = currentMode === 'fast' ? 4 : 7;
+
+        function renderCurrentContent(upTo) {
+            const currentText = fullText.substring(0, upTo);
+            const rendered = renderMessageWithCode(currentText);
+            const hasCode = rendered.parts && rendered.parts.some(p => p.type === 'code');
+            bubble.innerHTML = '';
+            if (!hasCode) {
+                bubble.innerHTML = currentText.replace(/\n/g, '<br>');
+            } else {
+                const fragment = document.createDocumentFragment();
+                for (const part of rendered.parts) {
+                    if (part.type === 'text') {
+                        const p = document.createElement('div');
+                        p.textContent = part.content;
+                        fragment.appendChild(p);
+                    } else if (part.type === 'code') {
+                        fragment.appendChild(buildCodeBlock(part));
+                    }
+                }
+                bubble.appendChild(fragment);
+            }
+            const cursor = document.createElement('span');
+            cursor.className = 'typing-cursor';
+            cursor.style.display = 'inline-block';
+            cursor.style.width = '2px';
+            cursor.style.height = '1.1em';
+            cursor.style.backgroundColor = 'var(--txt)';
+            cursor.style.marginLeft = '2px';
+            cursor.style.animation = 'blink 1s step-end infinite';
+            cursor.style.verticalAlign = 'text-bottom';
+            bubble.appendChild(cursor);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        renderCurrentContent(0);
+
+        const interval = setInterval(() => {
+            if (stopTyping) {
+                clearInterval(interval);
+                resolve();
+                return;
+            }
+            if (i < fullText.length) {
+                i++;
+                renderCurrentContent(i);
+            } else {
+                clearInterval(interval);
+                const rendered = renderMessageWithCode(fullText);
+                const hasCode = rendered.parts && rendered.parts.some(p => p.type === 'code');
+                bubble.innerHTML = '';
+                if (!hasCode) {
+                    bubble.innerHTML = fullText.replace(/\n/g, '<br>');
+                } else {
+                    const fragment = document.createDocumentFragment();
+                    for (const part of rendered.parts) {
+                        if (part.type === 'text') {
+                            const p = document.createElement('div');
+                            p.textContent = part.content;
+                            fragment.appendChild(p);
+                        } else if (part.type === 'code') {
+                            fragment.appendChild(buildCodeBlock(part));
+                        }
+                    }
+                    bubble.appendChild(fragment);
+                }
+
+                const actions = document.createElement('div');
+                actions.className = 'msg-actions';
+                const copyFullBtn = document.createElement('button');
+                copyFullBtn.className = 'msg-act-btn';
+                copyFullBtn.innerHTML = '<i class="fas fa-copy"></i> Salin';
+                copyFullBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    navigator.clipboard?.writeText(fullText).then(() => {
+                        showToast('Disalin', 'success');
+                    }).catch(() => {});
+                });
+                actions.appendChild(copyFullBtn);
+
+                const speakBtn = document.createElement('button');
+                speakBtn.className = 'msg-act-btn';
+                speakBtn.innerHTML = '<i class="fas fa-volume-up"></i> Suara';
+                speakBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!window.speechSynthesis) {
+                        showToast('Browser tidak mendukung speech synthesis', 'error');
+                        return;
+                    }
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(fullText);
+                    utterance.lang = 'id-ID';
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    window.speechSynthesis.speak(utterance);
+                });
+                actions.appendChild(speakBtn);
+
+                bubble.appendChild(actions);
+                chatArea.scrollTop = chatArea.scrollHeight;
+                resolve();
+            }
+        }, baseSpeed);
+        typeInterval = interval;
+    });
+}
+
+sendBtn.addEventListener('click', function(e) {
+    if (isProcessing) {
+        e.preventDefault();
+        stopTyping = true;
+        isProcessing = false;
+        clearInterval(thinkingInterval);
+        clearInterval(typeInterval);
+        hideThinking();
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        this.classList.remove('stop-btn');
+        showToast('Proses dihentikan', 'info');
+    } else {
+        sendMessage();
+    }
+});
+
+document.getElementById('msgDeleteBtn').addEventListener('click', () => {
+    if (selectedMsgIndex !== null && selectedMsgIndex < currentSession.length) {
+        currentSession.splice(selectedMsgIndex, 1);
+        document.querySelectorAll('.msg-row').forEach(el => el.remove());
+        for (const msg of currentSession) {
+            addMessage(msg.role, msg.content);
+        }
+        saveCurrentSession();
+        renderHistoryList();
+        showToast('Pesan dihapus', 'info');
+    }
+    document.getElementById('msgModal').classList.remove('show');
+    selectedMsgIndex = null;
+});
+
+document.getElementById('msgEditBtn').addEventListener('click', () => {
+    if (selectedMsgIndex !== null && selectedMsgIndex < currentSession.length) {
+        const msg = currentSession[selectedMsgIndex];
+        if (msg.role === 'user') {
+            chatInput.value = msg.content;
+            chatInput.focus();
+            currentSession.splice(selectedMsgIndex, 1);
+            document.querySelectorAll('.msg-row').forEach(el => el.remove());
+            for (const m of currentSession) {
+                addMessage(m.role, m.content);
+            }
+            saveCurrentSession();
+            renderHistoryList();
+            showToast('Pesan siap diedit', 'info');
+        }
+    }
+    document.getElementById('msgModal').classList.remove('show');
+    selectedMsgIndex = null;
+});
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.msg-modal') === null && !e.target.closest('.msg-modal-content')) {
+        document.getElementById('msgModal').classList.remove('show');
+        selectedMsgIndex = null;
+    }
+});
+
+const loginModal = document.getElementById('loginModal');
+const loginUsername = document.getElementById('loginUsername');
+const loginBtn = document.getElementById('loginBtn');
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewContainer = document.getElementById('previewContainer');
+const previewImage = document.getElementById('previewImage');
+const removeImageBtn = document.getElementById('removeImageBtn');
+const loginPromptOptions = document.querySelectorAll('.login-prompt-option');
+
+let loginAvatarBase64 = null;
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+});
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+});
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+        handleFile(file);
+    }
+});
+fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) handleFile(file);
+});
+
+function handleFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        loginAvatarBase64 = e.target.result;
+        previewImage.src = loginAvatarBase64;
+        previewContainer.style.display = 'flex';
+        dropZone.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+}
+
+removeImageBtn.addEventListener('click', () => {
+    loginAvatarBase64 = null;
+    previewContainer.style.display = 'none';
+    dropZone.style.display = 'block';
+    fileInput.value = '';
+});
+
+loginPromptOptions.forEach(btn => {
+    btn.addEventListener('click', () => {
+        loginPromptOptions.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    });
+});
+
+loginBtn.addEventListener('click', () => {
+    const username = loginUsername.value.trim() || 'AskalXML User';
+    const activePrompt = document.querySelector('.login-prompt-option.active');
+    const promptStyle = activePrompt ? activePrompt.dataset.prompt : 'normal';
+
+    storage.setItem('askal_username', username);
+    storage.setItem('askal_prompt_style', promptStyle);
+    if (loginAvatarBase64) {
+        storage.setItem('askal_avatar', loginAvatarBase64);
+    }
+
+    customUsername = username;
+    customPromptStyle = promptStyle;
+    userAvatarImage = loginAvatarBase64;
+    userDisplayName.textContent = username;
+    if (loginAvatarBase64) {
+        userAvatar.innerHTML = `<img src="${loginAvatarBase64}" alt="Avatar">`;
+    } else {
+        userAvatar.textContent = username.charAt(0).toUpperCase();
+    }
+
+    loginModal.classList.add('hidden');
+    showToast(`Selamat datang, ${username}!`, 'success');
+});
+
+function checkLogin() {
+    const savedUsername = storage.getItem('askal_username');
+    const savedStyle = storage.getItem('askal_prompt_style');
+    const savedAvatar = storage.getItem('askal_avatar');
+
+    if (savedUsername) {
+        customUsername = savedUsername;
+        customPromptStyle = savedStyle || 'normal';
+        if (savedAvatar) {
+            userAvatarImage = savedAvatar;
+            userAvatar.innerHTML = `<img src="${savedAvatar}" alt="Avatar">`;
+        } else {
+            userAvatar.textContent = savedUsername.charAt(0).toUpperCase();
+        }
+        userDisplayName.textContent = savedUsername;
+        loginModal.classList.add('hidden');
+    } else {
+        loginModal.classList.remove('hidden');
+    }
+}
+
+const customModal = document.getElementById('customModal');
+const customBtn = document.getElementById('customBtn');
+const customModalClose = document.getElementById('customModalClose');
+const usernameInput = document.getElementById('usernameInput');
+const promptOptions = document.querySelectorAll('.prompt-option');
+const customSaveBtn = document.getElementById('customSaveBtn');
+const userDisplayName = document.getElementById('userDisplayName');
+const userAvatar = document.getElementById('userAvatar');
+
+function loadCustomPreferences() {
+    try {
+        const savedUsername = storage.getItem('askal_username');
+        const savedStyle = storage.getItem('askal_prompt_style');
+        if (savedUsername) {
+            customUsername = savedUsername;
+            usernameInput.value = savedUsername;
+            userDisplayName.textContent = savedUsername || 'AskalXML User';
+            const savedAvatar = storage.getItem('askal_avatar');
+            if (savedAvatar) {
+                userAvatar.innerHTML = `<img src="${savedAvatar}" alt="Avatar">`;
+            } else {
+                userAvatar.textContent = savedUsername ? savedUsername.charAt(0).toUpperCase() : 'Z';
+            }
+        }
+        if (savedStyle && PROMPT_STYLES[savedStyle]) {
+            customPromptStyle = savedStyle;
+            promptOptions.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.prompt === savedStyle);
+            });
+        }
+    } catch (_) {}
+}
+loadCustomPreferences();
+
+customBtn.addEventListener('click', () => {
+    customModal.classList.add('show');
+});
+
+customModalClose.addEventListener('click', () => {
+    customModal.classList.remove('show');
+});
+
+customModal.addEventListener('click', (e) => {
+    if (e.target === customModal) {
+        customModal.classList.remove('show');
+    }
+});
+
+promptOptions.forEach(btn => {
+    btn.addEventListener('click', () => {
+        promptOptions.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        customPromptStyle = btn.dataset.prompt;
+    });
+});
+
+customSaveBtn.addEventListener('click', () => {
+    const newUsername = usernameInput.value.trim() || 'AskalXML User';
+    customUsername = newUsername;
+    storage.setItem('askal_username', newUsername);
+    storage.setItem('askal_prompt_style', customPromptStyle);
+    userDisplayName.textContent = newUsername;
+    const savedAvatar = storage.getItem('askal_avatar');
+    if (savedAvatar) {
+        userAvatar.innerHTML = `<img src="${savedAvatar}" alt="Avatar">`;
+    } else {
+        userAvatar.textContent = newUsername.charAt(0).toUpperCase();
+    }
+    customModal.classList.remove('show');
+    showToast(`Username: ${newUsername}, Gaya: ${customPromptStyle}`, 'success');
+});
+
+function loadSessions() {
+    try {
+        const raw = storage.getItem('askal_sessions');
+        if (raw) {
+            allSessions = JSON.parse(raw);
+            if (!Array.isArray(allSessions)) allSessions = [];
+        } else {
+            allSessions = [];
+        }
+    } catch (_) {
+        allSessions = [];
+    }
+}
+
+function renderHistoryList() {
+    const list = document.getElementById('chatHistoryList');
+    list.innerHTML = '';
+    loadSessions();
+    if (allSessions.length === 0) {
+        list.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:8px 14px;">Belum ada chat</div>';
+        return;
+    }
+    allSessions.forEach((session) => {
+        const div = document.createElement('div');
+        div.className = 'sb-item';
+
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'sb-icon';
+        iconSpan.textContent = '💬';
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'sb-label';
+        const date = new Date(session.timestamp).toLocaleString('id-ID', {
+            hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short'
+        });
+        labelSpan.textContent = `${session.name} (${date})`;
+        div.appendChild(iconSpan);
+        div.appendChild(labelSpan);
+        div.addEventListener('click', () => {
+            loadSession(session.id);
+        });
+        list.appendChild(div);
+    });
+}
+
+const attachBtn = document.getElementById('attachBtn');
+const attachOptions = document.getElementById('attachOptions');
+const attachPhoto = document.getElementById('attachPhoto');
+const attachVideo = document.getElementById('attachVideo');
+const attachFile = document.getElementById('attachFile');
+
+const photoInput = document.createElement('input');
+photoInput.type = 'file';
+photoInput.accept = 'image/*';
+photoInput.style.display = 'none';
+document.body.appendChild(photoInput);
+
+const videoInput = document.createElement('input');
+videoInput.type = 'file';
+videoInput.accept = 'video/*';
+videoInput.style.display = 'none';
+document.body.appendChild(videoInput);
+
+const fileInputGeneric = document.createElement('input');
+fileInputGeneric.type = 'file';
+fileInputGeneric.style.display = 'none';
+document.body.appendChild(fileInputGeneric);
+
+attachBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    attachOptions.classList.toggle('show');
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.attach-container')) {
+        attachOptions.classList.remove('show');
+    }
+});
+
+attachPhoto.addEventListener('click', () => {
+    photoInput.click();
+    attachOptions.classList.remove('show');
+});
+
+photoInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        const dataUrl = ev.target.result;
+        pendingImageBase64 = dataUrl.split(',')[1];
+        pendingImageFile = file;
+        showImagePreview(dataUrl, file.name);
+        chatInput.focus();
+        showToast('Foto siap, tambahkan keterangan lalu kirim', 'info');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+});
+
+attachVideo.addEventListener('click', () => {
+    videoInput.click();
+    attachOptions.classList.remove('show');
+});
+
+videoInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const msg = `🎥 [Video] ${file.name}`;
+        addMessage('user', msg);
+        currentSession.push({ role: 'user', content: msg });
+        saveCurrentSession();
+        sendMessageToGroq(`Saya mengirimkan video: ${file.name}. Tolong beri tanggapan.`);
+    }
+    videoInput.value = '';
+});
+
+attachFile.addEventListener('click', () => {
+    fileInputGeneric.click();
+    attachOptions.classList.remove('show');
+});
+
+fileInputGeneric.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const msg = `📄 [File] ${file.name}`;
+        addMessage('user', msg);
+        currentSession.push({ role: 'user', content: msg });
+        saveCurrentSession();
+        sendMessageToGroq(`Saya mengirimkan file: ${file.name}. Tolong analisis atau bantu saya dengan file ini.`);
+    }
+    fileInputGeneric.value = '';
+});
+
+chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!isProcessing) sendMessage();
+    }
+});
+chatInput.addEventListener('input', () => {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+});
+
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const menuBtn = document.getElementById('menuBtn');
+const sbClose = document.getElementById('sbClose');
+
+menuBtn.addEventListener('click', () => {
+    if (window.innerWidth > 768) {
+        sidebar.classList.toggle('collapsed');
+    } else {
+        sidebar.classList.add('open');
+        overlay.classList.add('show');
+    }
+});
+sbClose.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+});
+overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+});
+
+const dropdownContainer = document.getElementById('methodDropdownContainer');
+const trigger = document.getElementById('methodDropdownTrigger');
+const options = document.querySelectorAll('.method-option');
+const currentLabel = document.getElementById('currentMethodLabel');
+
+trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdownContainer.classList.toggle('open');
+});
+
+options.forEach(opt => {
+    opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        options.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        const mode = opt.dataset.method;
+        currentMode = mode;
+        const label = opt.dataset.label || opt.querySelector('span').textContent;
+        const icon = opt.querySelector('i').cloneNode(true);
+        currentLabel.innerHTML = '';
+        currentLabel.appendChild(icon);
+        currentLabel.appendChild(document.createTextNode(' ' + label));
+        modelDisplay.textContent = label;
+        dropdownContainer.classList.remove('open');
+        showToast(`Mode: ${label}`, 'info');
+    });
+});
+
+document.addEventListener('click', () => {
+    dropdownContainer.classList.remove('open');
+});
+
+loadSessions();
+modelDisplay.textContent = 'Smart AI';
+
+checkLogin();
+
+const savedUser = storage.getItem('askal_username') || 'AskalXML User';
+const savedAvatar = storage.getItem('askal_avatar');
+if (savedAvatar) {
+    userAvatar.innerHTML = `<img src="${savedAvatar}" alt="Avatar">`;
+} else {
+    userAvatar.textContent = savedUser.charAt(0).toUpperCase();
+}
+userDisplayName.textContent = savedUser;
+
+welcomeState.style.display = 'flex';
+currentSession = [];
+document.querySelectorAll('.msg-row').forEach(el => el.remove());
+
+renderHistoryList();
+
+console.log('KalzTzy AI siap! Mode:', currentMode);
+console.log('Sesi tersimpan:', allSessions.length);
+console.log('Groq API untuk teks, OpenRouter untuk vision.');
+console.log('👤 Pencipta: AskallXML');
+console.log('🔊 Alarm suara siap!');
