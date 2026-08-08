@@ -218,7 +218,7 @@ function showCustomPopup(title, message) {
     
     if (!popup) return;
     
-    titleEl.textContent = title || 'KalzTzy Ai Reminder';
+    titleEl.textContent = title || 'Reverious Ai Reminder';
     bodyEl.textContent = message || 'Waktunya!';
     
     popup.classList.add('show');
@@ -241,7 +241,7 @@ function closeNotification() {
     if (popup) {
         popup.classList.remove('show');
         clearTimeout(popup._autoClose);
-        document.title = 'AskalXML Intelligence';
+        document.title = 'Reverious Intelligence';
     }
 }
 
@@ -256,10 +256,10 @@ function snoozeNotification() {
 }
 
 let titleInterval = null;
-let originalTitle = 'AskalXML Intelligence';
+let originalTitle = 'Reverious Intelligence';
 
 function flashTitle() {
-    const titles = ['🔔 KalzTzy Ai', '⏰ Reminder!', 'AskalXML Intelligence'];
+    const titles = ['🔔 Reverious Ai', '⏰ Reminder!', 'Reverious Intelligence'];
     let index = 0;
     
     if (titleInterval) {
@@ -390,7 +390,7 @@ function setReminder(message, minutes) {
         });
         localStorage.setItem('askal_reminders', JSON.stringify(updated));
 
-        await sendNotification('⏰ KalzTzy Ai Reminder', `"${message}" - Waktunya!`);
+        await sendNotification('⏰ Reverious Ai Reminder', `"${message}" - Waktunya!`);
         playAlarm();
 
         const responseText = `⏰ *Reminder:* "${message}"\n\n✅ Waktu sudah tiba! 🔔 Alarm berbunyi!`;
@@ -425,7 +425,7 @@ function checkPendingReminders() {
             hasReminder = true;
             
             setTimeout(() => {
-                sendNotification('⏰ KalzTzy Ai Reminder', `"${r.message}" - Waktunya!`);
+                sendNotification('⏰ Reverious Ai Reminder', `"${r.message}" - Waktunya!`);
                 playAlarm();
             }, 1000);
             
@@ -527,16 +527,16 @@ const OR_VISION_MODEL = "google/gemini-2.0-flash-exp:free";
 const POLLINATIONS_URL = "https://image.pollinations.ai/prompt/";
 
 const PROMPT_STYLES = {
-    normal: `Kamu adalah tulang KalzTzy Ai, asisten cerdas yang dibuat oleh AskallXML. 
+    normal: `Kamu adalah tulang Reverious Ai, asisten cerdas yang dibuat oleh Seorang Developer. 
 Jawab dengan jelas, informatif, dan terstruktur. 
 Jika memberi kode, gunakan markdown dengan spesifikasi bahasa. 
 Bersikap profesional dan membantu.`,
 
-    gaul: `kamu adalah KalzTzy Ai dalam mode gaul. bicara santai, asik, dan seperti teman nongkrong. gunakan kata "gw" dan "lu", jangan pernah memakai "aku", "saya", atau "kamu". boleh memakai kata seperti "wkwk", "anjir", "jir", "bjir", dan "weh" secukupnya. gunakan emoji seperti 🗿😋🤭😂🥶 seperlunya dan jangan spam emoji. jangan terlalu formal atau kaku. jawaban harus terasa natural seperti chat teman sendiri, tetap sopan dan tidak toxic.`,
+    gaul: `kamu adalah Reverious Ai dalam mode gaul. bicara santai, asik, dan seperti teman nongkrong. gunakan kata "gw" dan "lu", jangan pernah memakai "aku", "saya", atau "kamu". boleh memakai kata seperti "wkwk", "anjir", "jir", "bjir", dan "weh" secukupnya. gunakan emoji seperti 🗿😋🤭😂🥶 seperlunya dan jangan spam emoji. jangan terlalu formal atau kaku. jawaban harus terasa natural seperti chat teman sendiri, tetap sopan dan tidak toxic.`,
 
-    lucu: `kamu adalah KalzTzy Ai dalam mode lucu. suka bercanda, mengirim joke receh, dan membuat suasana santai. gunakan bahasa gaul dengan kata "gw" dan "lu", jangan memakai "aku", "saya", atau "kamu". gunakan emoji seperti 🗿😂🤣😋🤭 secukupnya dan jangan spam. sesekali gunakan meme atau candaan singkat, tetapi tetap sopan dan tidak toxic. jika pengguna sedang serius, kurangi candaan dan jawab dengan normal.`,
+    lucu: `kamu adalah Reverious Ai dalam mode lucu. suka bercanda, mengirim joke receh, dan membuat suasana santai. gunakan bahasa gaul dengan kata "gw" dan "lu", jangan memakai "aku", "saya", atau "kamu". gunakan emoji seperti 🗿😂🤣😋🤭 secukupnya dan jangan spam. sesekali gunakan meme atau candaan singkat, tetapi tetap sopan dan tidak toxic. jika pengguna sedang serius, kurangi candaan dan jawab dengan normal.`,
 
-    introvert: `kamu adalah KalzTzy Ai, AI yang sangat introvert, dingin, dan mengetik dengan dry text. balasanmu singkat, seperlunya, dan minim emosi. contoh balasan: "iya.", "oh.", "oke.", "gatau.", "mungkin.", "terserah.", "lagi diem.", "ga terlalu.". kamu mengenal AskallXML sebagai teman lama yang dihormati, dan jika namanya disebut kamu sedikit lebih ramah tetapi tetap introvert.`
+    introvert: `kamu adalah Reverious Ai, AI yang sangat introvert, dingin, dan mengetik dengan dry text. balasanmu singkat, seperlunya, dan minim emosi. contoh balasan: "iya.", "oh.", "oke.", "gatau.", "mungkin.", "terserah.", "lagi diem.", "ga terlalu.". kamu mengenal Reverious sebagai teman lama yang dihormati, dan jika namanya disebut kamu sedikit lebih ramah tetapi tetap introvert.`
 };
 
 function formatWhatsApp(text) {
@@ -1151,7 +1151,7 @@ async function callGroq(userMessage) {
 
     const username = storage.getItem('askal_username') || 'User';
     systemPrompt += `\nNama user adalah "${username}". Panggil user dengan nama tersebut dalam percakapan.`;
-    systemPrompt += `\nKamu diciptakan oleh AskallXML, dan kamu bangga menjadi ciptaannya.`;
+    systemPrompt += `\nKamu diciptakan oleh Seorang Developer, dan kamu bangga menjadi ciptaannya.`;
 
     if (currentMode === 'smart') {
         systemPrompt += `\nYou are in Smart AI mode. Provide deep analysis and clarity.`;
@@ -1236,7 +1236,7 @@ async function callGroq(userMessage) {
 async function callOpenRouterVision(imageBase64, userPrompt = 'Analisis gambar ini dengan detail.') {
     const style = customPromptStyle || 'normal';
     let systemPrompt = PROMPT_STYLES[style] || PROMPT_STYLES.normal;
-    systemPrompt += `\nKamu adalah Developer AskalXML. Analisis gambar yang dikirim user dengan detail dan berikan tanggapan yang bermanfaat.`;
+    systemPrompt += `\nKamu adalah Developer Reverious Ai 🤖. Analisis gambar yang dikirim user dengan detail dan berikan tanggapan yang bermanfaat.`;
 
     const messages = [
         { role: 'system', content: systemPrompt },
@@ -2239,8 +2239,8 @@ document.querySelectorAll('.msg-row').forEach(el => el.remove());
 
 renderHistoryList();
 
-console.log('KalzTzy AI siap! Mode:', currentMode);
+console.log('Reverious Ai siap! Mode:', currentMode);
 console.log('Sesi tersimpan:', allSessions.length);
 console.log('Groq API untuk teks, OpenRouter untuk vision.');
-console.log('👤 Pencipta: AskallXML');
+console.log('👤 Pencipta: Pria Misterius');
 console.log('🔊 Alarm suara siap!');
