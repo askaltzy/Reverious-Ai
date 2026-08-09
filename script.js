@@ -659,7 +659,12 @@ function quickCommand(text) {
 }
 
 function showImagePreview(dataUrl, fileName) {
-    clearImagePreview();
+    // Hapus preview lama saja. Jangan memanggil clearImagePreview() di sini
+    // karena fungsi tersebut juga menghapus pendingImageBase64/pendingImageFile.
+    if (imagePreviewDiv) {
+        imagePreviewDiv.remove();
+        imagePreviewDiv = null;
+    }
 
     imagePreviewDiv = document.createElement('div');
     imagePreviewDiv.id = 'imagePreviewContainer';
